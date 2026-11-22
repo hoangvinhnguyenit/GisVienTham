@@ -1,0 +1,814 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+.ana { gap: 12px; }
+.ana-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; }
+.ana-head h2 { margin: 0; }
+.ana-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+select { border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 6px; padding: 4px 8px; }
+.ana svg { width: 100%; height: auto; display: block; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+.ana svg text { fill: var(--muted); font: 11px var(--font-mono); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; }
+.chips span { display: inline-flex; align-items: center; gap: 6px; }
+.tbl-wrap { overflow-x: auto; }
+table.chg { border-collapse: collapse; width: 100%; font-size: 13px; }
+table.chg th, table.chg td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.chg th:first-child, table.chg td:first-child { text-align: left; }
+table.chg th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.up { color: #b3261e; } .down { color: #1b7f3b; } .flat { color: var(--muted); }
+.dbar { display: inline-block; height: 8px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+.site-foot { grid-column: 1 / -1; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: 13px; }
+.site-foot strong { color: var(--fg); }
+.scope { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-start; }
+.scope-fig { margin: 0; flex: 0 0 auto; max-width: 100%; }
+.scope-fig img { width: 349px; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; display: block; }
+.scope-fig figcaption { font-size: 11.5px; color: var(--muted); margin-top: 4px; max-width: 349px; }
+.scope .hint { flex: 1 1 260px; }
+.ana h3 { margin: 6px 0 2px; font-size: 14px; font-weight: 600; }
+.ana .sub { margin: 0 0 8px; color: var(--muted); font-size: 12.5px; }
+.chips button { border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 2px 10px 2px 6px; font: inherit; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chips button[aria-pressed="false"] { opacity: .4; text-decoration: line-through; }
+.brow { display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr) 190px; gap: 10px; align-items: center; font-size: 13px; padding: 3px 0; }
+.brow .nm { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bt { height: 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px; position: relative; overflow: hidden; }
+.bt i { position: absolute; top: 0; bottom: 0; }
+.bt .zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--muted); opacity: .6; }
+.brow .val { text-align: right; font: 12.5px var(--font-mono); }
+@media (max-width: 640px) { .brow { grid-template-columns: minmax(0, 1fr) 140px; } .brow .bt { grid-column: 1 / -1; order: 3; } }
+table.heat { border-collapse: collapse; font: 12px var(--font-mono); width: 100%; min-width: 560px; }
+table.heat th, table.heat td { padding: 5px 6px; text-align: center; border: 1px solid var(--line); }
+table.heat th { font-weight: 600; color: var(--muted); font-size: 11px; }
+table.heat th.rh { text-align: left; white-space: nowrap; }
+table.heat td.diag { background: var(--chip); color: var(--muted); }
+</style></head><body>
+<title>Ứng dụng GIS trong phân tích biến động lớp phủ bề mặt và sử dụng đất tại Hà Nội giai đoạn 1990–2020</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: thanh điều khiển bên trái (danh sách năm, độ mờ, chú giải), bản đồ bên phải; xếp dọc trên điện thoại. */
+:root {
+  --bg: #f3f5f7;
+  --panel: #ffffff;
+  --line: #d9dfe5;
+  --fg: #18222d;
+  --muted: #5d6b7a;
+  --accent: #1f6fd1;
+  --accent-fg: #ffffff;
+  --stage: #dfe5ea;
+  --chip: #eaeff4;
+  --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11171d; --panel: #18212a; --line: #2b3844; --fg: #e5ebf1; --muted: #93a3b3;
+    --accent: #5aa2f5; --accent-fg: #0b1a2b; --stage: #0c1116; --chip: #212d38;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11171d; --panel: #18212a; --line: #2b3844; --fg: #e5ebf1; --muted: #93a3b3;
+  --accent: #5aa2f5; --accent-fg: #0b1a2b; --stage: #0c1116; --chip: #212d38;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); }
+body {
+  margin: 0; color: var(--fg); background: var(--bg);
+  font-family: var(--font-ui); font-size: 14px; line-height: 1.45;
+  padding-block: 16px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.app { max-width: 1400px; margin: 0 auto; display: grid; gap: 16px; grid-template-columns: 232px minmax(0, 1fr); align-items: start; }
+@media (max-width: 860px) { .app { grid-template-columns: minmax(0, 1fr); } }
+header { grid-column: 1 / -1; display: grid; gap: 4px; padding-bottom: 10px; border-bottom: 2px solid var(--accent); }
+.topic { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font-size: clamp(17px, 2.2vw, 24px); font-weight: 700; line-height: 1.3; letter-spacing: 0; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: grid; gap: 10px; min-width: 0; }
+h2 { margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.layers { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.layer { position: relative; }
+.layer label { display: block; text-align: center; font: 600 12px var(--font-mono); padding: 4px 0; border: 1px solid var(--line); border-radius: 5px; background: var(--bg); color: var(--muted); cursor: pointer; user-select: none; }
+.layer label:hover { background: var(--chip); }
+.layer input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.layer input:checked + label { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.layer input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 1px; }
+.layer .x { position: absolute; top: -5px; right: -4px; width: 14px; height: 14px; padding: 0; border: 0; border-radius: 50%; background: var(--fg); color: var(--panel); font-size: 10px; line-height: 14px; cursor: pointer; z-index: 2; }
+.mini { font-size: 12px; padding: 3px 8px; }
+.row.tight { gap: 4px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { border: 1px solid var(--line); background: var(--panel); color: var(--fg); padding: 5px 10px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: var(--chip); }
+.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn:focus-visible, .seg button:focus-visible, .layer input:focus-visible, input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; background: var(--panel); color: var(--fg); padding: 5px 10px; font-size: 13px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); font-weight: 600; }
+.slider { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 10px; align-items: center; }
+.slider output { font: 13px var(--font-mono); text-align: right; color: var(--muted); }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.lg-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; }
+.lg-head h2 { margin: 0; }
+.lg-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.defs { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); align-items: start; }
+.def { border: 1px solid var(--line); border-radius: 6px; background: var(--bg); min-width: 0; }
+.def summary { list-style: none; display: flex; align-items: center; gap: 10px; padding: 8px 10px; cursor: pointer; font-weight: 600; }
+.def summary::-webkit-details-marker { display: none; }
+.def summary::after { content: "+"; margin-left: auto; color: var(--muted); font: 600 16px var(--font-mono); }
+.def[open] summary::after { content: "−"; }
+.def summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 6px; }
+.def p { margin: 0; padding: 0 10px 10px 34px; color: var(--muted); font-size: 13px; }
+.dname { min-width: 0; display: grid; }
+.dname small { font-weight: 400; color: var(--muted); font-size: 12px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; flex: none; border: 1px solid rgba(0,0,0,.25); }
+.stagewrap { display: grid; gap: 10px; min-width: 0; }
+.bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.badge { font: 600 13px var(--font-mono); background: var(--accent); color: var(--accent-fg); padding: 2px 8px; border-radius: 4px; }
+.hint { color: var(--muted); font-size: 12.5px; }
+.stage { position: relative; width: 100%; overflow: hidden; background: var(--stage); border: 1px solid var(--line); border-radius: 8px; touch-action: none; cursor: grab; user-select: none; }
+.stage.dragging { cursor: grabbing; }
+.world { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+.world img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; -webkit-user-drag: none; }
+.empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); text-align: center; padding: 24px; }
+.grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); }
+.tile { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.tile .scroll { overflow-x: auto; background: var(--stage); }
+.tile img { width: 200%; max-width: none; height: auto; display: block; }
+.tile figcaption { padding: 6px 10px; font: 600 13px var(--font-mono); display: flex; justify-content: space-between; }
+.credit { color: var(--muted); font-size: 12px; margin: 0; }
+[hidden] { display: none !important; }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 600; }
+.full { width: 100%; justify-content: center; }
+.lg-toggle { position: absolute; top: 8px; right: 8px; z-index: 5; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.lg-pop { position: absolute; top: 44px; right: 8px; z-index: 5; width: 250px; max-height: calc(100% - 56px); overflow: auto; background: rgba(255,255,255,.94); color: #18222d; border: 1px solid rgba(0,0,0,.2); border-radius: 8px; padding: 8px 10px; box-shadow: 0 2px 10px rgba(0,0,0,.3); cursor: default; font-size: 12.5px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .lg-pop { background: rgba(24,33,42,.94); color: #e5ebf1; border-color: rgba(255,255,255,.2); } }
+.lg-pop h3 { margin: 0 0 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; display: flex; justify-content: space-between; align-items: center; }
+.lg-pop h3 button { border: 0; background: transparent; color: inherit; font-size: 16px; cursor: pointer; line-height: 1; padding: 0 2px; }
+.lg-pop ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.lg-pop li { display: flex; align-items: center; gap: 8px; }
+.lg-pop .sw { width: 16px; height: 16px; }
+.lg-pop a { display: block; margin-top: 8px; font-size: 12px; color: var(--accent); cursor: pointer; }
+</style>
+
+<div class="app">
+  <header>
+    <div class="topic">Đề tài</div>
+    <h1>ỨNG DỤNG GIS TRONG PHÂN TÍCH BIẾN ĐỘNG LỚP PHỦ BỀ MẶT VÀ SỬ DỤNG ĐẤT TẠI HÀ NỘI GIAI ĐOẠN 1990–2020</h1>
+    <p>Chọn năm để hiện ảnh lớp phủ tương ứng.</p>
+  </header>
+
+  <aside class="panel" aria-label="Điều khiển">
+    <section>
+      <h2>Năm</h2>
+      <ul class="layers" id="layers"></ul>
+      <div class="row tight" style="margin-top:8px">
+        <button class="btn mini" id="allBtn" type="button">Tất cả</button>
+        <button class="btn mini" id="noneBtn" type="button">Bỏ chọn</button>
+        <button class="btn mini" id="addBtn" type="button" title="Thêm ảnh PNG (tên file chứa năm)">+ Ảnh</button>
+      </div>
+      <input id="file" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+    </section>
+
+    <section>
+      <div class="seg" role="group" aria-label="Chế độ hiển thị" style="display:flex">
+        <button type="button" id="modeStack" aria-pressed="true" style="flex:1">Chồng lớp</button>
+        <button type="button" id="modeGrid" aria-pressed="false" style="flex:1">Lưới</button>
+      </div>
+    </section>
+
+    <section>
+      <button class="btn full" id="playBtn" type="button" aria-pressed="false">▶ Tự chuyển ảnh (3 giây)</button>
+    </section>
+
+    <section>
+      <button class="btn full" id="anaBtn" type="button">📊 Phân tích biến đổi</button>
+    </section>
+
+    <section id="opacityBox">
+      <div class="slider" title="Độ đậm của mỗi lớp">
+        <input id="opacity" type="range" min="10" max="100" value="100" step="5" aria-label="Độ đậm của mỗi lớp">
+        <output id="opacityOut" for="opacity">100%</output>
+      </div>
+    </section>
+  </aside>
+
+  <main class="stagewrap">
+    <div class="bar">
+      <div class="badges" id="badges" aria-live="polite"></div>
+      <div class="row" id="zoomRow">
+        <button class="btn" id="zoomOut" type="button" aria-label="Thu nhỏ">−</button>
+        <button class="btn" id="zoomIn" type="button" aria-label="Phóng to">+</button>
+        <button class="btn" id="zoomReset" type="button">Về giữa</button>
+      </div>
+    </div>
+    <div class="stage" id="stage" style="aspect-ratio: 1348 / 718">
+      <div class="world" id="world"></div>
+      <button class="btn lg-toggle" id="lgToggle" type="button" aria-expanded="true" aria-controls="lgPop">Chú giải</button>
+      <div class="lg-pop" id="lgPop" aria-label="Chú giải nhanh">
+        <h3><span>Chú giải</span><button type="button" id="lgClose" aria-label="Đóng chú giải">×</button></h3>
+        <div id="lgScheme" style="font-size:11.5px;opacity:.75;margin:-2px 0 6px"></div>
+        <ul id="lgList"></ul>
+        <a id="lgMore">Xem định nghĩa chi tiết ↓</a>
+      </div>
+      <div class="empty" id="empty" hidden>Chưa chọn năm nào. Chọn một năm ở bên trái.</div>
+    </div>
+    <div class="grid" id="grid" hidden></div>
+    <p class="hint" id="navHint">Ảnh hiển thị vừa khung. Kéo để di chuyển, cuộn chuột hoặc hai ngón để phóng to/thu nhỏ.</p>
+    <section class="panel ana" id="anaBox" aria-label="Phân tích biến đổi lớp phủ">
+      <div class="ana-head">
+        <h2>Phân tích biến đổi lớp phủ Hà Nội theo năm</h2>
+        <div class="seg" role="group" aria-label="Kiểu biểu đồ">
+          <button type="button" id="chLine" aria-pressed="true">Đường</button>
+          <button type="button" id="chStack" aria-pressed="false">Cột chồng</button>
+        </div>
+      </div>
+      <div class="scope">
+        <figure class="scope-fig">
+          <img src="img/pham_vi_ha_noi.png" alt="Phạm vi phân tích: địa phận Hà Nội theo ranh giới tỉnh" width="349" height="180">
+          <figcaption>Phạm vi phân tích: địa phận Hà Nội theo ranh giới tỉnh (viền vàng). Vùng xám bị loại.</figcaption>
+        </figure>
+        <p class="hint" id="anaMsg" style="margin:0"></p>
+      </div>
+
+      <div>
+        <h3>1. Tỉ lệ từng lớp phủ qua các năm</h3>
+        <p class="sub">Bấm tên lớp để ẩn hoặc hiện đường tương ứng (chế độ Đường). Đường đỏ (Đô thị) được làm trơn theo xu hướng tăng dần bằng hồi quy đơn điệu, nét đứt mờ là số liệu gốc từng năm. Rê chuột vào điểm để xem giá trị.</p>
+        <div id="anaChart"></div>
+        <div class="chips" id="anaChips" style="margin-top:10px"></div>
+      </div>
+
+      <div>
+        <h3>2. So sánh hai năm</h3>
+        <div class="ana-tools" style="margin-bottom:8px">
+          <span>Từ năm</span><select id="anaFrom" aria-label="Năm đầu"></select>
+          <span>đến năm</span><select id="anaTo" aria-label="Năm cuối"></select>
+        </div>
+        <div class="tbl-wrap" id="anaTable"></div>
+      </div>
+
+      <div>
+        <h3>3. Lớp phủ nào chuyển thành lớp nào</h3>
+        <p class="sub" id="anaTransSum"></p>
+        <div id="anaTrans"></div>
+        <div class="tbl-wrap" id="anaHeat" style="margin-top:10px"></div>
+      </div>
+
+      <div>
+        <h3>4. Tốc độ thay đổi trung bình mỗi năm</h3>
+        <p class="sub">Độ dốc đường hồi quy tuyến tính của tỉ lệ từng lớp theo năm trên toàn chuỗi.</p>
+        <div id="anaTrend"></div>
+      </div>
+
+      <p class="hint" style="margin:0">Tỉ lệ tính trên số điểm ảnh trong ranh giới Hà Nội nhận diện được theo 7 màu lớp phủ chính. Nền trắng, ranh giới, chữ và màu lạ bị bỏ qua. Đây là tỉ lệ diện tích tương đối trong địa phận Hà Nội, chưa quy ra km².</p>
+    </section>
+    <section class="panel" id="legendBox" aria-label="Chú giải và định nghĩa">
+      <div class="lg-head">
+        <h2>Chú giải và định nghĩa</h2>
+        <div class="lg-tools">
+          <div class="seg" role="group" aria-label="Bảng phân loại" id="schemeSeg">
+            <button type="button" id="schemeEsri" aria-pressed="false">Esri Sentinel-2</button>
+            <button type="button" id="schemeVnm" aria-pressed="true">VNM v21.09 cấp 2</button>
+          </div>
+          <button class="btn" id="expandBtn" type="button">Thu gọn định nghĩa</button>
+          <button class="btn" id="toggleLegend" type="button" aria-expanded="true" aria-controls="lgBody">Ẩn chú giải</button>
+        </div>
+      </div>
+      <div id="lgBody">
+        <p class="hint" id="schemeNote" style="margin:0 0 10px"></p>
+        <div class="defs" id="defs"></div>
+      </div>
+    </section>
+    <p class="credit">Khu vực: miền Bắc Việt Nam (Sơn La, Hà Nội, Hải Phòng, Hạ Long). Nguồn dữ liệu: Esri, Sentinel-2 10 m, Impact Observatory.</p>
+  </main>
+  <footer class="site-foot"><strong>Môn:</strong> Ứng dụng GIS và Viễn thám trong quản lý tài nguyên môi trường</footer>
+</div>
+
+<script>
+(function () {
+  // Mỗi lớp: [tên, màu, định nghĩa, tên tiếng Anh (có thể bỏ trống)]
+  var SCHEMES = {
+    esri: {
+      note: "Bảng phân loại Esri và Impact Observatory, ảnh Sentinel-2 độ phân giải 10 m. Đây là bảng của 4 ảnh đang hiển thị.",
+      classes: [
+        ["Nước", "#1A5BAB", "Vùng có nước hiện diện gần như quanh năm, ít hoặc không có thực vật và không có công trình như bến bãi. Ví dụ: sông, ao, hồ, biển.", "Water"],
+        ["Cây, rừng", "#358221", "Cụm thực vật cao và dày, thường có tán kín. Ví dụ: rừng, đồn điền cây lâu năm, rừng ngập mặn.", "Trees"],
+        ["Thực vật ngập nước", "#87D19E", "Thực vật xen lẫn nước trong phần lớn thời gian của năm, ngập theo mùa. Ví dụ: ruộng lúa và vùng canh tác ngập nước, rừng ngập mặn.", "Flooded vegetation"],
+        ["Cây trồng", "#FFDB5C", "Ngũ cốc, cỏ và cây do con người gieo trồng, thấp hơn tầm cây thân gỗ. Ví dụ: ngô, lúa mì, đậu tương, ruộng bỏ hóa.", "Crops"],
+        ["Khu xây dựng", "#ED022A", "Công trình do con người xây, mạng lưới đường lớn, bề mặt không thấm nước. Ví dụ: nhà ở, làng và đô thị dày đặc, đường nhựa, nhà xưởng.", "Built area"],
+        ["Đất trống", "#EDE9E4", "Đá hoặc đất có rất ít hoặc không có thực vật quanh năm. Ví dụ: đá lộ, bãi cát, lòng hồ cạn, mỏ khai thác.", "Bare ground"],
+        ["Băng, tuyết", "#A8EBFF", "Vùng phủ băng hoặc tuyết gần như quanh năm. Hiếm hoặc không có ở miền Bắc Việt Nam.", "Snow/Ice"],
+        ["Mây", "#F2FAFF", "Điểm ảnh bị mây che nên không xác định được lớp phủ bên dưới.", "Clouds"],
+        ["Đồng cỏ", "#C6AD8D", "Vùng thoáng phủ cỏ khá đồng nhất, ít hoặc không có cây cao, không thấy dấu hiệu canh tác rõ. Ví dụ: đồng cỏ tự nhiên, bãi chăn thả, công viên, sân cỏ.", "Rangeland"]
+      ]
+    },
+    vnm: {
+      note: "Bảng phân loại cấp 2 của bộ dữ liệu VNM v21.09 (18 lớp). Màu lấy gần đúng theo bảng màu trên bản đồ, mô tả mang tính giải thích chung.",
+      classes: [
+        ["Khu vực phát triển cao", "#BE0000", "Khu xây dựng mật độ cao, bề mặt không thấm nước chiếm ưu thế. Ví dụ: trung tâm đô thị, khu công nghiệp, cảng, sân bay, đường lớn."],
+        ["Khu vực kém phát triển", "#E8402F", "Khu xây dựng mật độ thấp, nhà ở xen cây xanh hoặc đất trống. Ví dụ: khu dân cư nông thôn, vùng ven đô, nhà rải rác."],
+        ["Ruộng lúa", "#3A86A7", "Đất trồng lúa nước, thường có mặt nước hoặc bùn ngập theo mùa vụ."],
+        ["Cây thân gỗ", "#E4C977", "Cây trồng lâu năm có thân gỗ do con người trồng và chăm sóc, như vườn cây ăn quả, cây công nghiệp lâu năm."],
+        ["Các vùng đất trồng trọt khác", "#E8A860", "Đất canh tác cây hàng năm hoặc ngắn ngày không phải lúa, như ngô, rau màu, cây công nghiệp ngắn ngày."],
+        ["Cây trồng trong nhà", "#D9532E", "Cây trồng trong nhà kính, nhà lưới hoặc nhà màng che phủ."],
+        ["Thảm thực vật đồng cỏ/thân thảo", "#FFFF00", "Vùng phủ cỏ hoặc thực vật thân thảo, ít cây gỗ. Ví dụ: đồng cỏ tự nhiên, bãi chăn thả, thảm cỏ."],
+        ["Vùng đất cằn cỗi", "#B3B3B3", "Đất, đá hoặc cát lộ ra, hầu như không có thực vật. Ví dụ: bãi cát, đá lộ, mỏ khai thác, đất san lấp."],
+        ["Cây bụi", "#A67B5B", "Thực vật thân gỗ thấp mọc thành bụi, tán thấp hơn rừng."],
+        ["Rừng lá rộng rụng lá", "#5EAB2B", "Rừng cây lá rộng rụng lá theo mùa, thường rụng vào mùa khô."],
+        ["Rừng lá rộng thường xanh", "#3C8A32", "Rừng cây lá rộng xanh quanh năm."],
+        ["Rừng lá kim thường xanh", "#1F5A28", "Rừng cây lá kim xanh quanh năm, như rừng thông."],
+        ["Đất trồng trọt", "#A6E05C", "Đất nông nghiệp đang canh tác hoặc có thảm thực vật thấp theo mùa vụ."],
+        ["Rừng ngập mặn", "#C233E9", "Rừng cây chịu mặn mọc ở vùng ven biển và cửa sông, chịu ảnh hưởng của thủy triều."],
+        ["Vùng đất ngập nước nội địa", "#1B4D1B", "Đất ngập nước trong đất liền có thực vật, như đầm lầy, bãi lau sậy, vùng trũng ngập theo mùa."],
+        ["Vùng nước mở", "#0E00A8", "Mặt nước thoáng không có thực vật, như sông, hồ, hồ chứa, biển."],
+        ["Nuôi trồng thủy sản", "#5C6BF2", "Ao, đầm, bể nuôi tôm cá do con người tạo ra, thường có bờ vuông vức."],
+        ["Khu vực tre", "#D4E157", "Vùng có tre, nứa mọc thành bụi hoặc rừng tre."]
+      ]
+    }
+  };
+  var scheme = "vnm";
+  // Tự dò và nạp mọi ảnh img/<năm>.png trong thư mục img (dò các năm 1980 đến 2040)
+  var Y0 = 1980, Y1 = 2040;
+  var layers = [];
+  var mode = "stack", opacity = 1, nextId = 1;
+  var view = { k: 1, x: 0, y: 0 };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var elLayers = $("layers"), elWorld = $("world"), elStage = $("stage"), elGrid = $("grid");
+
+  // chú giải và định nghĩa
+  var elDefs = $("defs");
+  function allOpen() { return elDefs.querySelectorAll("details:not([open])").length === 0; }
+  function syncExpandBtn() { $("expandBtn").textContent = allOpen() ? "Thu gọn định nghĩa" : "Mở hết định nghĩa"; }
+  function renderDefs() {
+    var s = SCHEMES[scheme];
+    $("schemeNote").textContent = s.note;
+    $("schemeEsri").setAttribute("aria-pressed", scheme === "esri");
+    $("schemeVnm").setAttribute("aria-pressed", scheme === "vnm");
+    elDefs.innerHTML = "";
+    s.classes.forEach(function (c) {
+      var d = document.createElement("details"); d.className = "def"; d.open = true;
+      var sm = document.createElement("summary");
+      var sw = document.createElement("span"); sw.className = "sw"; sw.style.background = c[1];
+      var nm = document.createElement("span"); nm.className = "dname"; nm.textContent = c[0];
+      if (c[3]) { var en = document.createElement("small"); en.textContent = c[3]; nm.appendChild(en); }
+      sm.appendChild(sw); sm.appendChild(nm);
+      var p = document.createElement("p"); p.textContent = c[2];
+      d.appendChild(sm); d.appendChild(p);
+      d.addEventListener("toggle", syncExpandBtn);
+      elDefs.appendChild(d);
+    });
+    syncExpandBtn();
+  }
+  $("schemeEsri").addEventListener("click", function () { scheme = "esri"; renderDefs(); });
+  $("schemeVnm").addEventListener("click", function () { scheme = "vnm"; renderDefs(); });
+  $("expandBtn").addEventListener("click", function () {
+    var open = !allOpen();
+    Array.prototype.forEach.call(elDefs.querySelectorAll("details"), function (d) { d.open = open; });
+    syncExpandBtn();
+  });
+  $("toggleLegend").addEventListener("click", function () {
+    var show = $("lgBody").hidden;
+    $("lgBody").hidden = !show;
+    $("schemeSeg").hidden = !show;
+    $("expandBtn").hidden = !show;
+    this.setAttribute("aria-expanded", show);
+    this.textContent = show ? "Ẩn chú giải" : "Hiện chú giải";
+  });
+  renderDefs();
+
+  function sorted() {
+    return layers.slice().sort(function (a, b) {
+      return (parseInt(a.year, 10) || 0) - (parseInt(b.year, 10) || 0);
+    });
+  }
+  function active() { return sorted().filter(function (l) { return l.on; }); }
+
+  function renderList() {
+    elLayers.innerHTML = "";
+    layers.forEach(function (l) {
+      var li = document.createElement("li");
+      li.className = "layer";
+      var cb = document.createElement("input");
+      cb.type = "checkbox"; cb.id = "cb-" + l.id; cb.checked = l.on;
+      cb.addEventListener("change", function () { l.on = cb.checked; renderStage(); });
+      var lb = document.createElement("label");
+      lb.htmlFor = cb.id; lb.textContent = l.year; lb.title = l.name;
+      li.appendChild(cb); li.appendChild(lb);
+      if (l.id.charAt(0) === "u") {
+        var rm = document.createElement("button");
+        rm.className = "x"; rm.type = "button"; rm.textContent = "×"; rm.setAttribute("aria-label", "Xóa ảnh " + l.year);
+        rm.addEventListener("click", function () {
+          layers = layers.filter(function (x) { return x.id !== l.id; });
+          renderList(); renderStage();
+        });
+        li.appendChild(rm);
+      }
+      elLayers.appendChild(li);
+    });
+  }
+
+  function applyView() {
+    elWorld.style.transform = "translate(" + view.x + "px," + view.y + "px) scale(" + view.k + ")";
+  }
+  var imgRatio = 1348 / 359; // tỉ lệ ngang/dọc của ảnh, giữ nguyên để ảnh không méo
+  function layoutWorld() {
+    var w = elStage.clientWidth;
+    elWorld.style.width = w + "px";
+    elWorld.style.height = (w / imgRatio) + "px";
+  }
+  function clampView() {
+    var w = elStage.clientWidth, h = elStage.clientHeight;
+    view.k = Math.min(12, Math.max(1, view.k));
+    var ww = elWorld.offsetWidth * view.k, wh = elWorld.offsetHeight * view.k;
+    view.x = ww <= w ? (w - ww) / 2 : Math.min(0, Math.max(w - ww, view.x));
+    view.y = wh <= h ? 0 : Math.min(0, Math.max(h - wh, view.y));
+  }
+  function resetView() {
+    layoutWorld();
+    view = { k: 1, x: 0, y: 0 };
+    clampView(); applyView();
+  }
+  function zoomAt(factor, cx, cy) {
+    var nk = Math.min(12, Math.max(1, view.k * factor));
+    var f = nk / view.k;
+    view.x = cx - (cx - view.x) * f;
+    view.y = cy - (cy - view.y) * f;
+    view.k = nk;
+    clampView(); applyView();
+  }
+
+  function renderStage() {
+    var act = active();
+    var stack = mode === "stack";
+    $("opacityBox").hidden = !stack;
+    $("zoomRow").hidden = !stack;
+    $("navHint").hidden = !stack;
+    elStage.hidden = !stack;
+    elGrid.hidden = stack;
+    $("empty").hidden = act.length > 0;
+    $("badges").innerHTML = act.length
+      ? act.map(function (l) { return '<span class="badge">' + esc(l.year) + "</span>"; }).join("")
+      : '<span class="hint">Chưa chọn năm</span>';
+
+    if (stack) {
+      elWorld.innerHTML = "";
+      act.forEach(function (l) {
+        var im = document.createElement("img");
+        im.src = l.src; im.alt = "Lớp phủ đất năm " + l.year; im.style.opacity = opacity;
+        elWorld.appendChild(im);
+      });
+      layoutWorld(); clampView(); applyView();
+    } else {
+      elGrid.innerHTML = "";
+      if (!act.length) {
+        var p = document.createElement("p"); p.className = "hint"; p.textContent = "Chưa chọn năm nào.";
+        elGrid.appendChild(p);
+      }
+      act.forEach(function (l) {
+        var f = document.createElement("figure"); f.className = "tile";
+        var im = document.createElement("img"); im.src = l.src; im.alt = "Lớp phủ đất năm " + l.year;
+        var c = document.createElement("figcaption"); c.textContent = l.year;
+        var sc = document.createElement("div"); sc.className = "scroll"; sc.appendChild(im); f.appendChild(sc); f.appendChild(c); elGrid.appendChild(f);
+      });
+    }
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  // chế độ
+  function setMode(m) {
+    mode = m;
+    $("modeStack").setAttribute("aria-pressed", m === "stack");
+    $("modeGrid").setAttribute("aria-pressed", m === "grid");
+    renderStage();
+  }
+  $("modeStack").addEventListener("click", function () { setMode("stack"); });
+  $("modeGrid").addEventListener("click", function () { setMode("grid"); });
+
+  $("opacity").addEventListener("input", function (e) {
+    opacity = e.target.value / 100;
+    $("opacityOut").textContent = e.target.value + "%";
+    Array.prototype.forEach.call(elWorld.children, function (im) { im.style.opacity = opacity; });
+  });
+  $("allBtn").addEventListener("click", function () { layers.forEach(function (l) { l.on = true; }); renderList(); renderStage(); });
+  $("noneBtn").addEventListener("click", function () { layers.forEach(function (l) { l.on = false; }); renderList(); renderStage(); });
+
+  // thêm ảnh
+  $("addBtn").addEventListener("click", function () { $("file").click(); });
+  $("file").addEventListener("change", function (e) {
+    var files = Array.prototype.slice.call(e.target.files || []);
+    files.forEach(function (f) {
+      var m = f.name.match(/(19|20)\d{2}/);
+      layers.push({ id: "u" + nextId++, year: m ? m[0] : "?", src: URL.createObjectURL(f), name: f.name, on: true });
+    });
+    e.target.value = "";
+    renderList(); renderStage();
+  });
+
+  // thu phóng, kéo
+  $("zoomIn").addEventListener("click", function () { zoomAt(1.5, elStage.clientWidth / 2, elStage.clientHeight / 2); });
+  $("zoomOut").addEventListener("click", function () { zoomAt(1 / 1.5, elStage.clientWidth / 2, elStage.clientHeight / 2); });
+  $("zoomReset").addEventListener("click", resetView);
+  elStage.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    var r = elStage.getBoundingClientRect();
+    zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, e.clientX - r.left, e.clientY - r.top);
+  }, { passive: false });
+
+  var pointers = {}, drag = null, pinch = null;
+  elStage.addEventListener("pointerdown", function (e) {
+    elStage.setPointerCapture(e.pointerId);
+    pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(pointers);
+    if (ids.length === 1) { drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y }; elStage.classList.add("dragging"); }
+    if (ids.length === 2) {
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) }; drag = null;
+    }
+  });
+  elStage.addEventListener("pointermove", function (e) {
+    if (!pointers[e.pointerId]) return;
+    pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(pointers);
+    if (ids.length === 2 && pinch) {
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      var d = Math.hypot(a.x - b.x, a.y - b.y);
+      var r = elStage.getBoundingClientRect();
+      zoomAt(d / pinch.d, (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top);
+      pinch.d = d;
+    } else if (drag) {
+      view.x = drag.vx + (e.clientX - drag.x);
+      view.y = drag.vy + (e.clientY - drag.y);
+      clampView(); applyView();
+    }
+  });
+  function endPtr(e) {
+    delete pointers[e.pointerId];
+    if (Object.keys(pointers).length < 2) pinch = null;
+    if (!Object.keys(pointers).length) { drag = null; elStage.classList.remove("dragging"); }
+  }
+  elStage.addEventListener("pointerup", endPtr);
+  elStage.addEventListener("pointercancel", endPtr);
+  window.addEventListener("resize", function () { if (elStage.hidden) return; layoutWorld(); clampView(); applyView(); });
+
+  // dò ảnh trong thư mục img, nạp hết ảnh tìm thấy
+  function setRatio(im) {
+    imgRatio = im.naturalWidth / im.naturalHeight;
+    elStage.style.aspectRatio = im.naturalWidth + " / " + im.naturalHeight;
+    resetView();
+  }
+  var pending = Y1 - Y0 + 1, found = [];
+  function finish() {
+    found.sort(function (a, b) { return a.y - b.y; });
+    layers = found.map(function (f, i) {
+      return { id: "y" + f.y, year: String(f.y), src: "img/" + f.y + ".png", name: f.y + ".png", on: i === 0 };
+    });
+    if (found.length) setRatio(found[0].im);
+    renderList(); renderStage();
+  }
+  for (var yy = Y0; yy <= Y1; yy++) (function (y) {
+    var im = new Image();
+    im.onload = function () { found.push({ y: y, im: im }); if (--pending === 0) finish(); };
+    im.onerror = function () { if (--pending === 0) finish(); };
+    im.src = "img/" + y + ".png";
+  })(yy);
+
+  // chú giải nổi trên bản đồ: các lớp màu thực sự xuất hiện trong ảnh
+  // các màu thực sự xuất hiện nhiều trong ảnh: in đậm trong chú giải
+  var IN_IMAGE = ["#BE0000", "#3A86A7", "#E4C977", "#5EAB2B", "#FFFF00", "#C233E9", "#0E00A8"];
+  function renderPop() {
+    $("lgList").innerHTML = SCHEMES[scheme].classes.map(function (c) {
+      var strong = scheme === "vnm" && IN_IMAGE.indexOf(c[1].toUpperCase()) >= 0;
+      return '<li' + (strong ? ' style="font-weight:600"' : "") + '><span class="sw" style="background:' + c[1] + '"></span>' + esc(c[0]) + "</li>";
+    }).join("");
+    $("lgScheme").textContent = scheme === "vnm" ? "VNM v21.09 cấp 2 (18 lớp)" : "Esri Sentinel-2 (9 lớp)";
+  }
+  renderPop();
+  $("schemeEsri").addEventListener("click", renderPop);
+  $("schemeVnm").addEventListener("click", renderPop);
+  function setPop(show) {
+    $("lgPop").hidden = !show;
+    $("lgToggle").setAttribute("aria-expanded", show);
+    $("lgToggle").textContent = show ? "Ẩn chú giải" : "Chú giải";
+  }
+  setPop(true);
+  $("lgToggle").addEventListener("click", function () { setPop($("lgPop").hidden); });
+  $("lgClose").addEventListener("click", function () { setPop(false); });
+  $("lgMore").addEventListener("click", function () {
+    $("legendBox").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  ["pointerdown", "wheel", "pointermove", "pointerup"].forEach(function (t) {
+    $("lgPop").addEventListener(t, function (e) { e.stopPropagation(); });
+    $("lgToggle").addEventListener(t, function (e) { e.stopPropagation(); });
+  });
+
+  // tự động chuyển ảnh mỗi 3 giây
+  var timer = null;
+  function step() {
+    var s = sorted(); if (!s.length) return;
+    var ai = -1; s.forEach(function (l, i) { if (l.on) ai = i; });
+    var nx = s[(ai + 1) % s.length];
+    layers.forEach(function (l) { l.on = (l === nx); });
+    renderList(); renderStage();
+  }
+  $("playBtn").addEventListener("click", function () {
+    var on = !timer;
+    if (on) { timer = setInterval(step, 3000); step(); } else { clearInterval(timer); timer = null; }
+    this.setAttribute("aria-pressed", on);
+    this.textContent = on ? "⏸ Dừng tự chuyển" : "▶ Tự chuyển ảnh (3 giây)";
+  });
+
+
+  // ===== phân tích biến đổi lớp phủ =====
+  // Dữ liệu tính sẵn từ 31 ảnh img/1990.png ... img/2020.png trên một khung chung
+  var A_CLS = [
+    { n: "Đô thị", c: [190, 0, 0] },
+    { n: "Ruộng lúa", c: [58, 134, 167] },
+    { n: "Cây thân gỗ", c: [228, 201, 119] },
+    { n: "Rừng, thảm xanh", c: [94, 171, 43] },
+    { n: "Đồng cỏ, thân thảo", c: [255, 255, 0] },
+    { n: "Rừng ngập mặn", c: [194, 51, 233] },
+    { n: "Nước", c: [14, 0, 168] }
+  ];
+  var ANA = {"y":[1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020],"c":[[1781,71983,31548,11109,95,0,3403],[4831,68484,29101,10728,48,0,3362],[3969,70333,27502,11798,0,0,2443],[5171,57067,35165,13374,10,0,3707],[5500,68161,24676,12416,5,0,4199],[2560,69742,32012,11944,0,0,2800],[4599,68698,28840,11138,0,0,2838],[5158,70498,23518,11610,6,0,4713],[5224,70227,25191,10999,1,0,4010],[6678,62097,33149,10184,8,0,3010],[4422,56096,42704,11031,4,0,3015],[7047,61078,31252,11108,2,0,3721],[8153,57347,35126,8829,23,0,3872],[8193,55722,37502,9601,31,0,3228],[8779,60760,28492,12562,1,0,3861],[6254,57879,32358,14042,0,0,4735],[7003,59065,26986,16336,5,0,5281],[7676,63065,26480,13827,8,0,4463],[8966,57138,30543,12254,0,0,4460],[8399,42726,47899,10625,0,0,4069],[9962,49997,37968,12058,0,0,3717],[9979,64940,20987,13277,146,0,4783],[9549,76386,9919,13657,404,0,5940],[11336,61684,16469,16204,122,0,6681],[12480,58091,22692,14620,64,0,4404],[10895,60345,24735,13862,2,0,3713],[11835,56807,27065,13070,12,0,3769],[14048,48788,30567,12328,20,0,4823],[11806,58221,27713,14099,5,0,2194],[15105,38235,37652,13138,54,0,5753],[16669,36089,39750,14068,137,0,2813]],"t":{"0-1":[1581,64,34,0,0,0,0,808,55690,8686,1044,5,0,600,1447,8840,16627,593,29,0,165,5,322,1664,8727,13,0,7,0,5,22,66,0,0,0,0,0,0,0,0,0,0,49,575,124,8,0,0,2341],"0-2":[1671,26,17,0,0,0,0,423,56024,9229,931,0,0,354,1078,9986,15153,1024,0,0,62,2,209,1179,9434,0,0,3,0,3,12,78,0,0,0,0,0,0,0,0,0,0,12,1036,114,18,0,0,1886],"0-3":[1756,5,3,0,0,0,0,729,48242,13917,1749,0,0,874,1638,6399,17946,1058,3,0,152,0,23,796,10072,3,0,4,0,0,3,86,3,0,0,0,0,0,0,0,0,0,16,535,75,13,0,0,2401],"0-4":[1752,5,0,0,0,0,0,799,55012,8385,881,0,0,1151,1785,9586,14191,870,4,0,199,18,313,405,10201,0,0,5,0,14,6,73,1,0,0,0,0,0,0,0,0,0,43,402,105,39,0,0,2475],"0-5":[1734,7,4,0,0,0,0,120,54859,11567,586,0,0,649,292,10682,17141,835,0,0,115,0,482,315,10115,0,0,3,0,14,1,80,0,0,0,0,0,0,0,0,0,0,7,850,309,22,0,0,1820],"0-6":[1742,13,0,0,0,0,0,512,54679,10238,684,0,0,656,1374,10409,14369,933,0,0,117,1,205,1492,9140,0,0,2,0,2,10,79,0,0,0,0,0,0,0,0,0,0,12,714,397,19,0,0,1849],"0-7":[1740,13,0,0,0,0,0,600,53461,9764,837,0,0,1712,1790,12822,10872,954,0,0,228,0,238,1117,9451,6,0,13,0,6,9,68,0,0,0,0,0,0,0,0,0,0,9,599,165,0,0,0,2356],"0-8":[1741,10,5,0,0,0,0,595,53597,10248,535,0,0,1394,1772,12435,11686,881,0,0,179,0,241,1315,9231,0,0,7,0,3,12,72,1,0,0,0,0,0,0,0,0,0,13,773,205,2,0,0,2090],"0-9":[1696,6,3,0,0,0,0,1191,48673,14153,490,0,0,697,2262,8950,14816,577,0,0,193,4,351,1621,8775,3,0,19,0,4,17,57,5,0,0,0,0,0,0,0,0,0,42,1143,44,28,0,0,1785],"0-10":[1664,6,8,0,0,0,1,571,45741,17775,945,0,0,803,1051,7077,19361,577,0,0,212,1,264,1450,9096,2,0,17,0,0,19,71,2,0,0,0,0,0,0,0,0,0,19,846,303,34,0,0,1674],"0-11":[1690,10,1,0,0,0,1,1415,48381,13170,819,0,0,1184,2362,8940,14080,897,1,0,208,3,255,1496,8969,0,0,24,0,0,19,74,1,0,0,0,0,0,0,0,0,0,54,662,146,33,0,0,1986],"0-12":[1689,18,2,0,0,0,0,1745,45952,14994,439,0,0,1258,2973,8045,14574,473,2,0,245,9,248,2745,7637,16,0,46,0,0,29,50,3,0,0,0,0,0,0,0,0,0,53,656,172,27,0,0,1951],"0-13":[1697,13,2,0,0,0,0,1799,45245,16351,487,0,0,838,2959,7601,15375,562,3,0,216,16,317,2138,8203,24,0,17,0,0,16,70,3,0,0,0,0,0,0,0,0,0,47,509,382,33,0,0,1839],"0-14":[1694,6,1,0,0,0,0,1996,48705,11709,1263,0,0,1187,3258,8726,13380,879,0,0,223,23,495,440,9900,1,0,49,0,5,11,77,0,0,0,0,0,0,0,0,0,0,58,400,335,24,0,0,2029],"0-15":[1690,4,4,0,0,0,0,1146,45951,13801,2261,0,0,1920,1956,8884,14671,1296,0,0,263,3,313,660,9884,0,0,50,0,1,9,84,0,0,0,0,0,0,0,0,0,0,41,265,428,33,0,0,2100],"0-16":[1685,8,3,0,0,0,0,1503,45719,11512,3775,0,0,2310,2217,9964,12519,1660,5,0,338,9,229,545,10134,0,0,30,0,1,8,86,0,0,0,0,0,0,0,0,0,0,53,380,228,51,0,0,2154],"0-17":[1693,8,1,0,0,0,0,1601,49601,10319,2093,4,0,1706,2677,9759,12735,1326,1,0,296,9,260,865,9782,2,0,25,0,2,13,80,0,0,0,0,0,0,0,0,0,0,55,611,159,44,0,0,2025],"0-18":[1702,2,2,0,0,0,0,2228,46479,12623,1126,0,0,1737,3206,7467,14324,1067,0,0,275,25,457,775,9554,0,0,47,0,10,9,75,0,0,0,0,0,0,0,0,0,0,61,404,329,29,0,0,2001],"0-19":[1694,2,6,0,0,0,0,2036,35464,24054,753,0,0,1527,2902,5212,18043,610,0,0,192,16,210,1587,8864,0,0,70,0,2,16,77,0,0,0,0,0,0,0,0,0,0,64,269,458,26,0,0,1946],"0-20":[1714,2,1,0,0,0,0,2583,40250,18620,1431,0,0,1308,3667,7319,14513,819,0,0,211,21,82,1392,9309,0,0,19,0,2,17,75,0,0,0,0,0,0,0,0,0,0,89,349,413,52,0,0,1843],"0-21":[1703,8,0,0,0,0,0,2513,50114,8135,2029,56,0,2158,3786,10804,10125,1086,19,0,240,25,418,731,9573,66,0,21,0,7,12,75,0,0,0,0,0,0,0,0,0,0,78,373,348,59,0,0,1973],"0-22":[1694,8,0,0,0,0,0,2383,55200,3429,2051,194,0,2842,3598,15671,5376,1207,76,0,370,21,695,176,9791,125,0,30,1,13,4,74,0,0,0,0,0,0,0,0,0,0,57,337,215,61,1,0,2190],"0-23":[1719,2,2,0,0,0,0,2990,46634,6626,3875,77,0,3466,4513,11063,8152,1492,12,0,390,35,283,427,10084,33,0,32,1,4,20,69,0,0,0,0,0,0,0,0,0,0,73,460,113,58,0,0,2242],"0-24":[1716,3,1,0,0,0,0,3585,45563,9631,2690,32,0,1787,4961,8789,10738,1215,0,0,234,35,371,360,10042,30,0,41,1,10,15,68,0,0,0,0,0,0,0,0,0,0,85,528,219,38,0,0,1965],"0-25":[1708,7,0,0,0,0,0,2915,47921,9847,2339,0,0,1281,4259,8554,11999,1036,0,0,205,22,507,426,9921,2,0,19,0,4,22,69,0,0,0,0,0,0,0,0,0,0,61,619,340,33,0,0,1852],"0-26":[1713,3,0,0,0,0,0,3372,45610,11259,2108,0,0,1393,4567,7806,12405,950,0,0,218,40,304,917,9475,12,0,32,1,2,24,67,0,0,0,0,0,0,0,0,0,0,86,505,384,35,0,0,1782],"0-27":[1725,4,0,0,0,0,0,4359,39393,14182,1896,7,0,2271,5527,6763,12254,869,0,0,291,54,200,1351,9047,12,0,41,0,2,20,73,0,0,0,0,0,0,0,0,0,0,112,393,351,45,0,0,1835],"0-28":[1706,5,3,1,0,0,0,3385,44682,12451,3392,1,0,403,4543,8902,11433,1271,0,0,141,35,193,1962,8631,4,0,8,0,2,25,67,0,0,0,0,0,0,0,0,0,0,103,1148,192,60,0,0,1399],"0-29":[1715,12,4,0,0,0,0,5070,30551,19526,2516,10,0,3242,5840,5206,13568,1207,3,0,296,61,161,1707,8752,38,0,41,1,0,25,67,0,0,0,0,0,0,0,0,0,0,119,357,370,86,0,0,1769],"0-30":[1731,0,2,0,0,0,0,5896,30511,20541,3044,73,0,721,6370,3725,14589,1168,0,0,203,69,138,1290,9180,60,0,16,3,0,22,66,0,0,0,0,0,0,0,0,0,0,154,358,424,51,0,0,1580],"1-2":[3138,709,132,4,0,0,7,294,57524,6045,730,0,0,273,142,6819,18196,1404,0,0,33,0,467,766,9220,0,0,6,0,0,5,41,0,0,0,0,0,0,0,0,0,0,7,920,96,32,0,0,1994],"1-3":[3188,353,495,12,0,0,26,866,48065,11499,1357,0,0,885,470,5188,18302,2453,0,0,144,0,344,1148,8900,10,0,11,0,0,20,27,0,0,0,0,0,0,0,0,0,0,1,577,87,33,0,0,2324],"1-4":[3269,446,286,2,0,0,26,841,52710,8007,582,0,0,1049,631,9512,13828,1963,0,0,139,0,898,308,9289,5,0,4,0,12,19,16,0,0,0,0,0,0,0,0,0,0,13,404,44,66,0,0,2566],"1-5":[2027,524,1343,0,0,0,6,155,53880,9764,370,0,0,546,146,9613,15371,1997,0,0,26,0,951,378,9114,0,0,1,0,18,11,18,0,0,0,0,0,0,0,0,0,0,11,631,285,47,0,0,2030],"1-6":[2991,493,513,4,0,0,22,566,54731,7633,545,0,0,578,444,8407,15813,1632,0,0,38,0,663,1180,8558,0,0,5,0,15,14,18,0,0,0,0,0,0,0,0,0,0,7,682,281,33,0,0,2009],"1-7":[3098,591,285,0,0,0,30,681,53862,7056,657,0,0,1566,670,10641,12624,1774,0,0,172,0,605,947,8764,6,0,31,2,7,22,15,0,0,0,0,0,0,0,0,0,0,3,516,130,7,0,0,2473],"1-8":[3121,443,479,0,0,0,33,771,53359,7587,383,0,0,1451,617,10857,12919,1654,0,0,68,0,606,1130,8606,1,0,8,0,5,28,15,0,0,0,0,0,0,0,0,0,0,1,733,190,10,0,0,2125],"1-9":[3309,283,448,0,0,0,14,1332,48696,11180,396,0,0,727,798,7664,16203,1187,0,0,115,3,649,1416,8228,8,0,19,2,2,29,13,0,0,0,0,0,0,0,0,0,0,11,1162,47,34,0,0,1798],"1-10":[2718,206,1017,1,0,0,40,562,46367,14567,703,0,0,807,364,5544,19310,1468,0,0,125,1,523,1442,8402,4,0,21,0,2,28,14,0,0,0,0,0,0,0,0,0,0,0,827,334,39,0,0,1682],"1-11":[3304,159,595,0,0,0,20,1495,48399,10464,629,0,0,1227,901,7895,14851,1692,0,0,100,2,561,1353,8326,2,0,28,0,5,22,18,0,0,0,0,0,0,0,0,0,0,15,690,135,37,0,0,1989],"1-12":[3637,165,351,1,0,0,20,1752,46424,11934,306,0,0,1272,1141,6633,16703,714,0,0,118,8,592,2042,7518,23,0,52,0,5,26,13,0,0,0,0,0,0,0,0,0,0,15,608,170,30,0,0,2027],"1-13":[3699,145,330,0,0,0,22,1738,45791,13241,340,0,0,843,1095,6169,17519,941,0,0,100,8,660,1574,7974,31,0,21,0,4,29,12,0,0,0,0,0,0,0,0,0,0,15,456,354,37,0,0,1932],"1-14":[3863,154,183,3,0,0,20,1767,48247,10276,777,0,0,1081,1290,7998,14182,1976,0,0,101,7,887,317,9204,1,0,46,1,3,27,14,0,0,0,0,0,0,0,0,0,0,25,402,211,36,0,0,2219],"1-15":[3272,147,641,4,0,0,21,1010,46535,11695,1337,0,0,1849,779,7432,14709,2809,0,0,133,7,629,577,9153,0,0,53,0,5,21,18,0,0,0,0,0,0,0,0,0,0,7,206,386,47,0,0,2233],"1-16":[3473,166,450,14,0,0,24,1270,46403,9937,2255,2,0,2317,881,8405,12571,3480,0,0,185,8,499,438,9489,3,0,31,0,6,17,20,0,0,0,0,0,0,0,0,0,0,9,366,182,83,0,0,2225],"1-17":[3599,185,322,4,0,0,26,1432,49547,8646,1297,3,0,1687,1054,8570,13353,2623,2,0,149,13,657,634,9133,3,0,24,0,6,19,21,0,0,0,0,0,0,0,0,0,0,13,592,130,63,0,0,2123],"1-18":[3830,101,281,0,0,0,24,1910,45626,11594,680,0,0,1759,1358,7322,14328,2114,0,0,101,15,773,641,8901,0,0,44,0,10,21,16,0,0,0,0,0,0,0,0,0,0,20,424,247,44,0,0,2120],"1-19":[3795,75,348,1,0,0,20,1605,36263,21434,508,0,0,1441,1199,4042,19158,1434,0,0,81,18,381,1555,8273,0,0,65,0,13,21,11,0,0,0,0,0,0,0,0,0,0,25,242,321,33,0,0,2136],"1-20":[3995,68,256,3,0,0,8,2225,41691,15343,957,0,0,1213,1647,5567,16462,1753,0,0,72,22,303,1218,8789,0,0,26,3,4,24,13,0,0,0,0,0,0,0,0,0,0,41,322,260,72,0,0,2066],"1-21":[3953,155,170,4,0,0,15,2249,50234,6761,1151,35,0,2013,1728,9607,11029,2350,60,0,116,22,717,491,9068,44,0,35,1,7,23,13,0,0,0,0,0,0,0,0,0,0,31,341,233,80,0,0,2186],"1-22":[3931,218,77,10,1,0,25,2049,54190,3166,1186,105,0,2694,1570,15230,5377,2540,186,0,210,20,952,103,9204,88,0,59,1,20,10,14,0,0,0,0,0,0,0,0,0,0,21,278,146,72,0,0,2389],"1-23":[4123,120,87,8,0,0,19,2754,46811,5969,2238,44,0,3376,2122,10124,8606,3241,52,0,177,28,484,236,9648,25,0,46,7,9,16,14,0,0,0,0,0,0,0,0,0,0,21,343,67,70,0,0,2465],"1-24":[4174,85,89,5,0,0,14,3411,45169,8962,1472,31,0,1663,2390,8405,11040,2802,8,0,85,34,576,311,9486,21,0,41,4,4,21,13,0,0,0,0,0,0,0,0,0,0,30,466,138,45,0,0,2205],"1-25":[3958,207,99,5,0,0,10,2769,47334,8807,1408,0,0,1241,1991,7900,12569,2494,2,0,64,36,729,416,9262,0,0,15,1,2,30,11,0,0,0,0,0,0,0,0,0,0,25,576,219,46,0,0,2046],"1-26":[4141,92,140,2,0,0,7,3100,45770,9723,1252,0,0,1268,2116,6927,13428,2142,3,0,78,25,564,694,9031,9,0,29,1,2,28,12,0,0,0,0,0,0,0,0,0,0,38,468,233,41,0,0,2056],"1-27":[4306,59,80,3,0,0,7,4122,40396,11745,1242,4,0,2101,2736,5594,14379,1666,3,0,119,39,366,980,8830,12,0,34,11,7,14,11,0,0,0,0,0,0,0,0,0,0,51,300,212,50,0,0,2168],"1-28":[4195,97,113,8,0,0,2,3031,44204,12033,1939,1,0,413,2108,8557,11930,2397,0,0,26,38,387,1336,8708,4,0,9,5,1,31,10,0,0,0,0,0,0,0,0,0,0,56,1156,110,66,0,0,1537],"1-29":[4357,51,89,18,0,0,1,4685,31063,17779,1673,11,0,3116,2972,4654,15131,1851,12,0,112,57,249,1187,8783,28,0,38,8,1,26,9,0,0,0,0,0,0,0,0,0,0,54,306,200,81,0,0,2135],"1-30":[4513,3,54,5,0,0,3,5395,31213,18870,1891,81,0,546,3360,3143,16196,2074,2,0,59,61,213,828,9259,45,0,11,8,1,27,10,0,0,0,0,0,0,0,0,0,0,93,286,240,54,0,0,1950],"2-3":[3400,55,224,2,0,0,9,550,52857,9871,899,0,0,1151,444,2517,20822,1462,0,0,74,21,153,761,10561,10,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,124,12,6,0,0,2149],"2-4":[3384,140,112,0,0,0,10,608,53958,8770,453,0,0,1584,619,9220,13251,1311,0,0,102,10,984,349,10223,5,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,187,8,26,0,0,2071],"2-5":[2151,250,892,0,0,0,5,101,54734,11055,134,0,0,848,101,9146,14660,1513,0,0,42,0,1285,295,9948,0,0,34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,452,149,21,0,0,1611],"2-6":[3150,99,305,2,0,0,6,384,58042,6755,289,0,0,910,382,6549,16908,1022,0,0,43,20,685,1157,9568,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,404,178,6,0,0,1643],"2-7":[3247,163,181,0,0,0,13,498,57024,6118,514,0,0,2063,592,8593,13760,1189,0,0,170,22,672,1011,9609,6,0,84,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,323,59,0,0,0,1920],"2-8":[3088,96,431,0,0,0,18,652,57104,6206,217,0,0,1660,543,8581,14224,1123,0,0,99,10,618,1293,9398,1,0,66,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,382,88,2,0,0,1810],"2-9":[3141,48,331,0,0,0,12,1179,51865,10087,261,0,0,943,772,5885,16974,686,0,0,167,22,702,1667,8965,8,0,26,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,673,22,17,0,0,1509],"2-10":[2658,39,709,1,0,0,12,465,48826,13980,534,0,0,1003,282,4103,19833,998,0,0,167,3,536,1746,9143,4,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,494,179,23,0,0,1439],"2-11":[3155,49,295,0,0,0,19,1368,50883,9904,503,0,0,1484,849,6250,15538,1167,0,0,165,22,521,1620,9108,2,0,66,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,381,86,21,0,0,1616],"2-12":[3409,51,117,0,0,0,15,1559,48855,11262,223,0,0,1591,1118,5165,17024,430,0,0,183,33,448,2739,7967,23,0,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,352,110,17,0,0,1608],"2-13":[3429,39,135,0,0,0,13,1614,48276,12359,256,0,0,1189,1052,4480,18079,627,0,0,154,17,598,2198,8455,31,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,21,340,225,21,0,0,1511],"2-14":[3497,43,82,0,0,0,17,1816,50093,10035,526,0,0,1454,1208,6844,14093,1705,0,0,153,14,852,744,9814,1,0,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,263,131,19,0,0,1729],"2-15":[3061,55,389,2,0,0,16,1030,48601,11497,901,0,0,2205,645,5748,14882,2771,0,0,215,7,653,1003,9728,0,0,112,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,171,216,29,0,0,1722],"2-16":[3170,59,274,9,0,0,18,1350,48601,9842,1561,0,0,2706,759,6620,12565,3770,3,0,253,18,526,810,10060,2,0,108,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,255,116,44,0,0,1699],"2-17":[3284,85,184,2,0,0,18,1547,50796,9107,934,3,0,2040,928,7775,12650,2600,2,0,240,10,644,1160,9637,2,0,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,392,90,29,0,0,1642],"2-18":[3436,55,99,0,0,0,18,2063,46254,12286,454,0,0,2146,1239,6780,13690,1869,0,0,174,17,880,1034,9475,0,0,74,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,313,146,22,0,0,1610],"2-19":[3373,29,186,0,0,0,11,1845,37328,21541,323,0,0,1763,1060,3183,18755,1220,0,0,184,11,449,2070,8750,0,0,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,156,233,22,0,0,1639],"2-20":[3467,33,135,1,0,0,10,2591,43548,14607,725,0,0,1567,1465,4061,16774,1541,0,0,172,20,231,1838,9303,0,0,46,0,0,0,0,0,0,0,0,0,0,0,0,0,0,45,242,174,41,0,0,1558],"2-21":[3473,114,56,1,0,0,12,2572,50949,7302,739,15,0,2389,1512,8728,10405,2487,84,0,232,21,918,921,9475,46,0,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,260,129,48,0,0,1689],"2-22":[3406,152,48,0,0,0,19,2435,54893,3481,722,65,0,3239,1394,13996,5111,2690,228,0,303,11,1493,201,9654,96,0,44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,231,80,39,0,0,1792],"2-23":[3544,79,47,3,0,0,18,3066,47817,6354,1599,34,0,3889,1949,9079,7873,3647,53,0,319,50,613,722,10006,33,0,58,0,0,0,0,0,0,0,0,0,0,0,0,0,0,30,235,51,44,0,0,1835],"2-24":[3586,42,57,0,0,0,14,3730,45501,9922,1040,20,0,2028,2197,8077,9879,2887,21,0,221,71,709,674,9927,22,0,70,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,288,114,27,0,0,1677],"2-25":[3423,125,69,0,0,0,14,3091,48025,9400,1035,0,0,1569,1787,7381,11729,2449,2,0,179,55,890,811,9722,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,30,403,148,29,0,0,1566],"2-26":[3581,58,49,0,0,0,9,3472,46723,9959,999,0,0,1639,1923,6052,13006,2114,2,0,173,51,643,1273,9385,10,0,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,45,330,175,29,0,0,1538],"2-27":[3642,28,40,1,0,0,10,4546,41417,11601,1038,3,0,2505,2526,4583,14118,1661,5,0,233,107,435,1577,9097,11,0,58,0,0,0,0,0,0,0,0,0,0,0,0,0,0,59,231,149,34,0,0,1617],"2-28":[3472,65,134,5,0,0,1,3661,45324,11975,1525,1,0,660,1843,7761,11101,2873,0,0,51,64,460,2271,8680,4,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,44,725,81,44,0,0,1260],"2-29":[3639,57,35,23,0,0,7,5221,31218,18570,1270,9,0,3551,2766,4270,13893,2145,12,0,216,116,372,1865,8957,32,0,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,60,262,165,36,0,0,1541],"2-30":[3727,2,31,3,0,0,3,6157,31225,19723,1512,73,0,901,3061,2974,14733,2408,6,0,155,152,278,1548,9341,52,0,26,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,236,172,39,0,0,1454],"3-4":[4339,289,107,4,0,0,7,174,49409,4450,84,0,0,645,363,11819,18361,880,0,0,46,38,1658,334,11047,0,0,38,0,0,0,4,3,0,0,0,0,0,0,0,0,0,16,335,11,64,0,0,3090],"3-5":[2443,683,1058,0,0,0,0,19,47931,6589,48,0,0,386,22,12779,19068,909,0,0,40,0,1988,403,10645,0,0,27,0,0,0,10,0,0,0,0,0,0,0,0,0,0,17,982,240,41,0,0,2103],"3-6":[3897,434,225,0,0,0,7,117,51090,3464,84,0,0,378,200,10885,20446,652,0,0,28,4,1016,1741,10123,0,0,29,0,0,0,10,0,0,0,0,0,0,0,0,0,0,14,811,311,30,0,0,2187],"3-7":[4017,404,144,0,0,0,12,162,50454,2986,325,0,0,1180,415,12788,17120,800,0,0,143,3,1158,1441,10240,3,0,92,0,0,4,0,3,0,0,0,0,0,0,0,0,0,6,633,93,2,0,0,2761],"3-8":[3977,240,468,0,0,0,12,259,50608,2850,120,0,0,974,360,12933,17468,648,0,0,103,2,1100,1745,9998,0,0,55,0,0,0,8,1,0,0,0,0,0,0,0,0,0,6,789,205,8,0,0,2441],"3-9":[4100,86,296,2,0,0,10,466,47021,5409,161,0,0,456,559,8840,21407,358,0,0,157,7,974,2467,9389,7,0,30,0,0,0,9,1,0,0,0,0,0,0,0,0,0,20,1342,53,36,0,0,1965],"3-10":[3250,91,950,2,0,0,20,143,44296,8404,300,0,0,506,148,6894,24714,608,0,0,157,3,733,2410,9768,3,0,33,0,0,0,9,1,0,0,0,0,0,0,0,0,0,3,1089,251,41,0,0,1889],"3-11":[4038,76,349,1,0,0,16,623,45599,5905,268,0,0,905,640,10023,18985,845,0,0,121,8,780,2320,9660,0,0,76,0,0,0,6,2,0,0,0,0,0,0,0,0,0,29,827,165,37,0,0,2159],"3-12":[4346,67,180,2,0,0,13,671,44131,6810,155,0,0,993,1009,8467,20502,380,0,0,147,31,681,3873,8093,17,0,98,0,0,0,1,5,0,0,0,0,0,0,0,0,0,26,775,219,27,0,0,2141],"3-13":[4342,66,206,2,0,0,9,686,43448,7815,180,0,0,686,1018,7729,21766,465,0,0,125,34,916,3135,8687,28,0,33,0,0,0,4,3,0,0,0,0,0,0,0,0,0,23,751,383,35,0,0,1966],"3-14":[4374,86,163,0,0,0,12,805,45298,5813,385,0,0,864,1301,9787,18061,1267,0,0,117,40,1463,1002,10397,1,0,103,0,0,0,10,0,0,0,0,0,0,0,0,0,0,38,584,246,34,0,0,2326],"3-15":[3782,149,506,1,0,0,16,400,43867,6907,687,0,0,1441,579,9181,19056,2093,0,0,173,17,865,1405,10592,0,0,112,0,0,0,10,0,0,0,0,0,0,0,0,0,0,20,333,389,52,0,0,2448],"3-16":[3978,169,327,7,0,0,17,601,43544,5950,1218,0,0,1897,740,10265,16269,3043,3,0,231,20,656,1147,11106,2,0,90,0,0,0,10,0,0,0,0,0,0,0,0,0,0,23,501,191,75,0,0,2456],"3-17":[4122,147,240,4,0,0,16,685,45453,5293,665,1,0,1407,925,11359,16126,2149,5,0,221,23,957,1675,10325,2,0,52,0,0,0,10,0,0,0,0,0,0,0,0,0,0,29,844,149,55,0,0,2229],"3-18":[4304,74,207,0,0,0,17,1012,41759,7977,318,0,0,1475,1332,9537,17632,1420,0,0,189,51,1506,1277,10049,0,0,69,0,0,0,10,0,0,0,0,0,0,0,0,0,0,32,626,331,42,0,0,2177],"3-19":[4122,74,421,0,0,0,9,938,34217,15277,264,0,0,1156,1212,5218,23772,745,0,0,156,38,693,2714,9292,0,0,114,0,0,0,10,0,0,0,0,0,0,0,0,0,0,36,354,488,33,0,0,2223],"3-20":[4390,87,214,3,0,0,10,1306,39593,9734,513,0,0,1033,1686,6853,20648,1136,0,0,153,42,307,2696,9866,0,0,45,0,0,0,10,0,0,0,0,0,0,0,0,0,0,63,490,393,98,0,0,2078],"3-21":[4292,254,77,0,0,0,13,1309,45242,4304,537,20,0,1771,1786,12688,12894,2035,62,0,214,44,1245,1401,10069,59,0,54,0,0,0,10,0,0,0,0,0,0,0,0,0,0,55,551,305,91,0,0,2229],"3-22":[4183,350,48,0,0,0,17,1205,47404,1992,590,62,0,2432,1708,19349,6414,2231,184,0,330,38,2169,325,10221,136,0,64,0,0,0,10,0,0,0,0,0,0,0,0,0,0,40,503,198,74,1,0,2432],"3-23":[4518,105,77,4,0,0,18,1543,42519,3909,1209,31,0,3034,2299,12963,9940,3284,53,0,358,66,869,1087,10781,31,0,82,0,0,0,10,0,0,0,0,0,0,0,0,0,0,39,603,83,99,0,0,2510],"3-24":[4619,57,54,3,0,0,12,2025,40905,6480,795,16,0,1407,2606,11135,13053,2412,11,0,203,95,1096,920,10667,35,0,93,0,0,0,10,0,0,0,0,0,0,0,0,0,0,51,724,176,52,0,0,2246],"3-25":[4378,180,73,1,0,0,15,1626,42553,6271,819,0,0,1052,2090,10866,14649,2000,2,0,155,47,1483,1033,10399,0,0,36,0,0,0,10,0,0,0,0,0,0,0,0,0,0,46,847,286,52,0,0,2046],"3-26":[4580,78,58,1,0,0,14,1859,42074,6314,759,0,0,1119,2255,9208,15939,1769,2,0,157,70,935,1846,9921,10,0,72,0,0,0,10,0,0,0,0,0,0,0,0,0,0,65,748,353,55,0,0,1975],"3-27":[4698,28,41,2,0,0,14,2560,37798,7732,764,2,0,1944,3092,7109,17103,1442,4,0,210,133,573,2386,9541,12,0,90,0,0,0,10,0,0,0,0,0,0,0,0,0,0,83,582,321,65,1,0,2110],"3-28":[4417,90,174,7,0,0,6,2012,39923,9039,1072,1,0,316,2279,11568,12860,3118,0,0,64,67,586,3273,8953,4,0,19,0,0,0,10,0,0,0,0,0,0,0,0,0,0,79,1430,122,67,0,0,1560],"3-29":[4646,112,52,24,0,0,7,3077,28377,13933,955,5,0,2950,3499,6275,17121,2230,12,0,215,149,423,2918,9178,37,0,88,0,0,0,10,0,0,0,0,0,0,0,0,0,0,77,541,349,84,0,0,2051],"3-30":[4789,10,47,6,0,0,7,3688,29195,14503,1124,61,0,523,3994,4193,18647,2422,3,0,142,184,418,2385,9700,70,0,33,0,0,0,10,0,0,0,0,0,0,0,0,0,0,114,595,373,79,0,0,1817],"4-5":[2483,609,1334,0,0,0,6,13,55298,9001,390,0,0,245,5,7490,15690,419,0,0,5,0,754,394,10959,0,0,34,0,0,0,5,0,0,0,0,0,0,0,0,0,0,14,1128,292,5,0,0,2355],"4-6":[3939,468,348,2,0,0,25,174,54091,9131,667,0,0,274,128,8539,14130,227,0,0,12,0,388,1493,10109,0,0,44,0,0,0,5,0,0,0,0,0,0,0,0,0,0,13,1042,384,5,0,0,2308],"4-7":[4081,438,278,0,0,0,31,264,54176,8097,758,0,0,1039,265,10044,11431,387,0,0,64,1,332,1192,10328,6,0,126,0,0,5,0,0,0,0,0,0,0,0,0,0,0,3,791,92,0,0,0,3020],"4-8":[3952,289,661,0,0,0,28,347,53350,8758,501,0,0,971,265,10757,11138,278,0,0,41,5,379,1399,10087,0,0,84,0,0,0,4,1,0,0,0,0,0,0,0,0,0,2,1099,222,4,0,0,2511],"4-9":[4131,125,473,2,0,0,24,672,48297,12733,408,0,0,439,371,7728,13958,157,0,0,86,6,494,1947,9428,8,0,57,0,0,0,3,0,0,0,0,0,0,0,0,0,0,18,1635,67,34,0,0,2052],"4-10":[3266,123,1157,2,0,0,50,219,44716,16928,810,0,0,490,102,6504,16115,244,0,0,94,4,387,1870,9719,4,0,51,0,0,0,5,0,0,0,0,0,0,0,0,0,0,3,1280,312,41,0,0,1949],"4-11":[4152,127,472,1,0,0,29,848,46675,13416,746,0,0,805,397,9136,11684,409,0,0,74,6,368,1732,9711,0,0,96,0,0,0,2,2,0,0,0,0,0,0,0,0,0,23,1003,182,30,0,0,2320],"4-12":[4478,136,242,2,0,0,24,1033,44901,14706,392,0,0,928,584,7753,13029,98,0,0,90,11,340,3143,8215,20,0,119,0,0,0,0,3,0,0,0,0,0,0,0,0,0,19,1005,233,19,0,0,2290],"4-13":[4466,115,287,2,0,0,26,1031,44406,15668,423,0,0,619,594,6911,14359,101,0,0,78,12,517,2364,8918,28,0,58,0,0,0,0,3,0,0,0,0,0,0,0,0,0,23,943,416,32,0,0,2103],"4-14":[4581,101,191,3,0,0,31,1181,48540,10669,1023,0,0,802,713,7429,13233,420,0,0,64,19,625,592,10749,1,0,124,0,0,0,5,0,0,0,0,0,0,0,0,0,0,32,821,278,44,0,0,2447],"4-15":[3912,148,613,1,0,0,38,560,45787,12660,2104,0,0,1412,338,7828,13174,798,0,0,108,9,432,955,10585,0,0,135,0,0,0,5,0,0,0,0,0,0,0,0,0,0,16,460,419,97,0,0,2582],"4-16":[4105,174,440,12,0,0,39,774,45527,10672,3443,4,0,1888,459,8847,11265,1145,0,0,145,13,282,815,10947,0,0,98,0,0,0,5,0,0,0,0,0,0,0,0,0,0,21,626,188,126,0,0,2604],"4-17":[4295,190,301,4,0,0,37,866,48868,9811,1859,6,0,1423,589,8689,11682,950,0,0,135,13,451,1177,10445,2,0,60,0,0,0,5,0,0,0,0,0,0,0,0,0,0,24,1050,162,105,0,0,2343],"4-18":[4532,99,231,0,0,0,35,1318,45302,12754,944,0,0,1461,800,7095,12712,636,0,0,106,20,707,941,10298,0,0,92,0,0,0,5,0,0,0,0,0,0,0,0,0,0,27,845,363,68,0,0,2293],"4-19":[4401,84,402,0,0,0,20,1165,35132,23283,644,0,0,1119,671,4656,16380,261,0,0,54,14,312,1988,9476,0,0,157,0,0,0,5,0,0,0,0,0,0,0,0,0,0,33,496,559,48,0,0,2355],"4-20":[4638,84,261,3,0,0,14,1692,39582,18249,1183,0,0,973,998,6967,13093,373,0,0,61,21,136,1699,10092,0,0,76,0,0,0,5,0,0,0,0,0,0,0,0,0,0,56,622,452,115,0,0,2233],"4-21":[4550,272,108,0,0,0,20,1651,49368,7984,1694,68,0,1695,1093,9687,9298,771,28,0,103,14,570,965,10372,47,0,73,0,0,0,5,0,0,0,0,0,0,0,0,0,0,52,661,347,75,0,0,2472],"4-22":[4418,378,62,1,0,0,31,1513,54396,3282,1731,201,0,2325,1053,14036,4984,871,82,0,227,11,997,298,10584,104,0,87,0,0,0,5,0,0,0,0,0,0,0,0,0,0,33,614,222,68,2,0,2693],"4-23":[4751,121,111,5,0,0,33,2078,46017,6768,3379,73,0,2923,1436,10356,7301,1121,12,0,230,32,372,641,10934,29,0,93,0,0,0,5,0,0,0,0,0,0,0,0,0,0,28,684,79,122,0,0,2789],"4-24":[4881,76,88,3,0,0,15,2640,45160,9185,2396,31,0,1373,1677,7946,10342,788,1,0,74,36,483,610,10821,25,0,108,0,0,0,5,0,0,0,0,0,0,0,0,0,0,45,775,196,96,5,0,2481],"4-25":[4581,231,116,1,0,0,19,2048,46780,9751,2069,0,0,1048,1398,7702,11190,664,0,0,62,15,769,672,10597,2,0,46,0,0,0,5,0,0,0,0,0,0,0,0,0,0,44,1007,303,108,0,0,2186],"4-26":[4806,104,119,1,0,0,15,2351,44637,11332,1839,0,0,1104,1448,7411,11189,570,0,0,83,39,492,1216,10167,12,0,72,0,0,0,5,0,0,0,0,0,0,0,0,0,0,58,883,392,95,0,0,2148],"4-27":[4961,48,74,1,0,0,16,3285,39047,13838,1720,5,0,1849,2040,6239,11580,453,0,0,137,62,278,1709,9736,12,0,83,0,0,0,5,0,0,0,0,0,0,0,0,0,0,73,645,360,84,1,0,2344],"4-28":[4619,115,249,7,0,0,12,2444,42733,13242,3027,1,0,277,1556,9141,9321,995,0,0,21,55,283,2391,9305,4,0,32,0,0,0,5,0,0,0,0,0,0,0,0,0,0,71,1671,152,75,0,0,1661],"4-29":[4972,101,67,7,0,0,9,3871,29390,20058,2277,11,0,2752,2312,5627,11865,762,4,0,201,80,210,2023,9513,37,0,87,0,0,0,5,0,0,0,0,0,0,0,0,0,0,75,548,405,105,0,0,2338],"4-30":[5087,13,70,5,0,0,8,4560,29369,20983,2714,84,0,474,2735,4196,13009,741,1,0,44,99,182,1621,9994,46,0,40,0,0,0,5,0,0,0,0,0,0,0,0,0,0,114,676,414,82,0,0,2026],"5-6":[2463,34,2,0,0,0,7,366,57727,6742,654,0,0,499,912,7696,18732,118,0,0,133,0,117,1274,10217,0,0,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,444,158,5,0,0,1963],"5-7":[2423,41,2,0,0,0,14,583,54507,7989,802,0,0,1550,1176,12026,12828,408,0,0,285,0,261,1038,10211,6,0,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,323,21,2,0,0,2301],"5-8":[2423,30,27,0,0,0,10,665,54064,8319,580,0,0,1430,1069,12186,13520,270,0,0,192,0,224,1309,9981,1,0,74,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,493,140,4,0,0,1915],"5-9":[2345,21,7,0,0,0,7,1174,49032,12454,555,0,0,748,1482,8818,16397,104,0,0,241,1,435,1725,9322,8,0,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,860,25,29,0,0,1618],"5-10":[2267,10,39,0,0,0,11,395,46649,15960,948,0,0,811,599,6142,21233,246,0,0,231,1,325,1672,9572,4,0,47,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,749,105,30,0,0,1547],"5-11":[2344,18,9,0,0,0,7,1375,48097,12169,938,0,0,1199,1619,9308,14877,419,0,0,262,2,313,1614,9507,2,0,84,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,502,122,25,0,0,1751],"5-12":[2349,30,13,0,0,0,5,1569,46243,13778,518,0,0,1246,2278,7817,15544,92,0,0,307,4,306,2963,8053,23,0,110,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,506,127,21,0,0,1761],"5-13":[2364,18,23,0,0,0,4,1543,46045,14586,508,0,0,866,2311,6631,17255,136,0,0,307,4,485,2219,8721,31,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,512,179,35,0,0,1636],"5-14":[2368,7,10,0,0,0,5,1670,49809,9814,1188,0,0,1132,2677,7313,15734,363,0,0,334,4,667,391,10568,1,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,422,95,46,0,0,1860],"5-15":[2348,4,22,0,0,0,6,891,47277,11723,2256,0,0,1794,1403,7635,16944,658,0,0,369,2,239,813,10558,0,0,121,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,238,152,73,0,0,1946],"5-16":[2318,22,27,0,0,0,7,1169,46635,9904,3695,1,0,2324,1766,9129,14208,965,3,0,452,5,188,622,10844,0,0,89,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,366,86,106,0,0,1862],"5-17":[2357,13,14,0,0,0,8,1306,50110,8817,2139,6,0,1711,2129,9003,14440,723,0,0,447,4,319,1027,10333,2,0,62,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,594,89,87,0,0,1711],"5-18":[2384,7,13,0,0,0,9,1822,45493,12848,1191,0,0,1760,2703,7815,14445,465,0,0,401,5,641,782,10165,0,0,84,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,523,126,56,0,0,1725],"5-19":[2349,6,43,0,0,0,7,1559,35790,23307,727,0,0,1505,2504,4610,18904,244,0,0,279,9,291,1721,9378,0,0,122,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,336,205,39,0,0,1769],"5-20":[2410,2,8,0,0,0,3,2287,41655,16518,1373,0,0,1226,3005,6076,16557,302,0,0,310,5,130,1443,9982,0,0,59,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,369,132,83,0,0,1748],"5-21":[2388,11,2,0,0,0,4,2243,50256,7349,1799,56,0,1984,3129,10364,11260,639,17,0,372,4,464,755,10313,67,0,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,324,104,77,0,0,1917],"5-22":[2354,20,2,0,0,0,8,1952,54565,3226,1892,202,0,2732,3125,16075,5766,708,64,0,538,6,789,141,10544,126,0,62,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,307,59,57,0,0,2018],"5-23":[2408,9,2,0,0,0,6,2744,46379,6580,3536,79,0,3330,3792,11267,8400,1050,9,0,580,7,339,443,10823,33,0,74,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,262,29,86,0,0,2084],"5-24":[2411,10,2,0,0,0,3,3493,44722,9723,2606,34,0,1601,4038,9458,11127,545,0,0,358,6,479,287,10831,25,0,94,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,336,59,61,3,0,1932],"5-25":[2407,6,3,0,0,0,4,2752,46788,9995,2193,2,0,1245,3433,9183,12287,459,0,0,341,3,552,449,10680,0,0,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,599,109,72,0,0,1672],"5-26":[2422,3,4,0,0,0,3,3028,44947,11308,2027,3,0,1276,3913,8121,12677,396,0,0,369,5,409,924,10200,9,0,62,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,548,109,63,0,0,1659],"5-27":[2444,1,3,0,0,0,4,4155,39845,13183,1856,7,0,2114,4690,6291,13415,383,0,0,403,7,268,1480,9681,12,0,68,0,0,0,0,0,0,0,0,0,0,0,0,0,0,46,325,100,59,0,0,1816],"5-28":[2401,15,7,1,0,0,3,3069,41971,14542,3078,1,0,421,3860,11567,9262,1118,0,0,165,3,287,2277,9072,4,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,38,875,78,106,0,0,1338],"5-29":[2411,28,5,0,0,0,6,4796,29686,19941,2261,13,0,3129,5079,6070,13269,898,2,0,365,12,188,1833,9431,38,0,65,0,0,0,0,0,0,0,0,0,0,0,0,0,0,47,313,125,84,0,0,1787],"5-30":[2455,1,3,0,0,0,2,5585,30431,20164,2765,82,0,620,5608,3881,15041,807,0,0,280,17,191,1435,9855,50,0,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,65,348,119,90,0,0,1606],"6-7":[3989,172,67,0,0,0,21,291,58573,5091,531,0,0,1275,286,7540,16012,1063,0,0,416,5,346,639,9764,6,0,88,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,299,17,0,0,0,2394],"6-8":[3835,115,290,0,0,0,19,411,57965,5409,227,0,0,1235,269,7984,16171,978,0,0,282,2,375,843,9544,1,0,55,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,478,111,7,0,0,2035],"6-9":[3810,53,159,0,0,0,18,818,52208,9551,307,0,0,612,420,5581,18649,707,0,0,340,7,535,1328,8881,8,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,833,45,33,0,0,1630],"6-10":[3137,53,662,0,0,0,20,240,49887,12541,562,0,0,668,119,3080,22056,1168,0,0,287,4,392,1524,8911,4,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,651,174,35,0,0,1615],"6-11":[3811,50,157,0,0,0,23,989,51850,8901,553,0,0,1111,496,5658,17205,1214,0,0,288,8,364,1350,8993,2,0,54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,469,105,27,0,0,1818],"6-12":[3984,55,93,0,0,0,23,1159,49999,10113,304,0,0,1178,870,4267,18844,422,0,0,302,9,361,2344,7864,23,0,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,428,146,22,0,0,1809],"6-13":[3968,42,129,0,0,0,17,1100,49822,10931,309,0,0,788,929,3076,20388,604,0,0,315,10,540,1731,8411,31,0,36,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,467,213,33,0,0,1661],"6-14":[4011,25,100,0,0,0,15,1218,51319,8977,631,0,0,1035,1184,5753,15710,1756,0,0,318,12,743,436,9653,1,0,95,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,354,116,40,0,0,1926],"6-15":[3540,73,350,0,0,0,18,661,49451,10623,987,0,0,1766,507,5136,16298,2888,0,0,345,8,382,899,9497,0,0,105,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25,212,204,56,0,0,1969],"6-16":[3698,82,201,2,0,0,23,895,49401,9059,1702,3,0,2217,669,5988,13898,3916,0,0,429,11,331,726,9742,2,0,83,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,294,106,87,0,0,1950],"6-17":[3842,64,136,2,0,0,24,992,52206,7770,1026,4,0,1633,843,6568,14456,2845,3,0,412,14,433,1149,9259,1,0,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,558,84,62,0,0,1802],"6-18":[3957,37,110,0,0,0,22,1492,47583,11320,520,0,0,1714,1186,5743,15069,2000,0,0,348,17,709,845,9242,0,0,68,0,0,0,0,0,0,0,0,0,0,0,0,0,0,35,456,144,43,0,0,1798],"6-19":[3850,47,246,0,0,0,15,1344,38273,20560,399,0,0,1396,1038,2357,20329,1178,0,0,280,14,372,1588,8686,0,0,106,0,0,0,0,0,0,0,0,0,0,0,0,0,0,27,236,235,36,0,0,1868],"6-20":[4014,58,111,0,0,0,11,2012,44951,13087,832,0,0,1192,1330,2851,19065,1349,0,0,309,26,182,1254,9348,0,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,46,343,139,90,0,0,1773],"6-21":[3969,121,45,0,0,0,14,1964,52123,6354,866,31,0,1938,1434,8145,11628,2341,69,0,367,17,568,727,9469,39,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,302,98,73,0,0,1970],"6-22":[3867,180,41,0,0,0,21,1774,55726,2854,935,78,0,2711,1426,13999,5799,2486,240,0,480,18,957,180,9633,67,0,46,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,284,64,63,0,0,2061],"6-23":[4087,66,36,0,0,0,21,2405,48581,5890,1785,46,0,3302,1868,8801,8605,3627,50,0,519,28,427,522,9861,20,0,54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,41,221,49,80,0,0,2128],"6-24":[4151,28,36,0,0,0,16,3039,46119,9457,1277,22,0,1552,2092,7832,10796,2734,32,0,355,25,589,375,9844,8,0,74,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,318,79,53,0,0,1966],"6-25":[3976,98,57,0,0,0,16,2464,48619,8904,1157,0,0,1197,1695,7058,12735,2383,2,0,301,20,685,515,9682,0,0,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,34,543,112,51,0,0,1763],"6-26":[4139,45,34,0,0,0,11,2738,47581,9444,1040,1,0,1243,1881,5470,14021,2048,6,0,304,29,509,866,9400,3,0,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,43,453,130,57,0,0,1779],"6-27":[4206,15,28,0,0,0,13,3746,42462,11044,999,5,0,2088,2552,3837,15100,1750,3,0,374,36,322,1324,9019,11,0,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,61,282,105,64,0,0,1881],"6-28":[4047,57,91,1,0,0,8,2809,45047,12427,1669,1,0,386,1912,8182,10960,3063,0,0,144,38,362,2100,8370,4,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58,913,73,66,0,0,1390],"6-29":[4149,92,29,11,0,0,7,4382,31457,18447,1500,1,0,3138,2872,4278,14465,1986,20,0,334,42,246,1534,8917,31,0,54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,68,322,134,64,0,0,1821],"6-30":[4291,2,18,0,0,0,7,5160,31632,19585,1625,74,0,594,3249,2685,15244,2461,31,0,238,56,225,1318,9178,25,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,88,358,116,81,0,0,1661],"7-8":[4282,83,417,0,0,0,0,348,61040,4696,223,0,0,626,54,5018,16272,381,1,0,17,0,467,705,10194,0,0,2,0,0,0,6,0,0,0,0,0,0,0,0,0,0,1,954,197,25,0,0,3212],"7-9":[4076,59,271,0,0,0,7,810,51550,11445,348,0,0,545,184,4876,15819,365,1,0,50,1,693,1356,9153,7,0,13,0,0,0,6,0,0,0,0,0,0,0,0,0,0,33,1952,79,63,0,0,2147],"7-10":[3223,68,951,1,0,0,7,258,48087,15700,653,0,0,594,47,3407,17892,632,1,0,61,0,592,1367,9329,3,0,15,0,0,0,6,0,0,0,0,0,0,0,0,0,0,4,1677,290,66,0,0,2071],"7-11":[4119,61,256,1,0,0,10,1013,50456,11650,586,0,0,939,211,5674,13920,822,2,0,59,2,624,1277,9307,0,0,24,0,0,0,6,0,0,0,0,0,0,0,0,0,0,31,1364,212,57,0,0,2395],"7-12":[4350,53,169,0,0,0,9,1206,48727,12789,283,0,0,960,488,4366,15438,280,4,0,80,5,590,2471,8001,16,0,43,0,0,0,2,3,0,0,0,0,0,0,0,0,0,32,1259,265,45,0,0,2435],"7-13":[4314,36,224,0,0,0,8,1219,48022,13850,300,0,0,709,528,3613,16530,373,4,0,80,5,758,1801,8590,23,0,20,0,0,0,3,2,0,0,0,0,0,0,0,0,0,23,1310,443,73,0,0,2125],"7-14":[4368,48,158,0,0,0,10,1335,50454,11088,693,0,0,859,710,5603,12967,1257,0,0,82,8,894,415,10022,1,0,47,0,0,0,6,0,0,0,0,0,0,0,0,0,0,45,1156,274,70,0,0,2532],"7-15":[3786,85,508,0,0,0,11,660,48613,12836,1280,0,0,1411,281,5155,13354,2084,0,0,124,2,585,804,9945,0,0,46,0,0,0,6,0,0,0,0,0,0,0,0,0,0,19,723,429,99,0,0,2768],"7-16":[3995,111,339,4,0,0,12,911,48928,10728,2099,2,0,1858,375,5664,11594,2957,3,0,139,6,540,603,10196,0,0,38,0,0,0,6,0,0,0,0,0,0,0,0,0,0,20,848,210,172,0,0,2798],"7-17":[4202,71,231,3,0,0,16,1061,51010,10160,1184,2,0,1505,462,6626,11523,2106,4,0,144,11,574,1023,9753,2,0,22,0,0,0,6,0,0,0,0,0,0,0,0,0,0,21,1482,164,119,0,0,2369],"7-18":[4330,31,212,0,0,0,13,1549,46433,13620,636,0,0,1520,783,5744,12166,1462,0,0,125,16,859,785,9630,0,0,42,0,0,0,6,0,0,0,0,0,0,0,0,0,0,26,1234,343,75,0,0,2385],"7-19":[4120,68,410,0,0,0,7,1379,37290,22892,462,0,0,1183,713,2452,16897,794,0,0,105,14,476,1666,8977,0,0,62,0,0,0,6,0,0,0,0,0,0,0,0,0,0,44,873,582,63,0,0,2398],"7-20":[4414,78,156,0,0,0,9,1997,43426,16113,849,0,0,1047,901,3331,15340,972,0,0,110,22,322,1329,9570,0,0,22,0,0,0,6,0,0,0,0,0,0,0,0,0,0,78,991,456,192,0,0,2222],"7-21":[4395,151,64,0,0,0,11,2014,51263,8419,904,27,0,1765,921,7725,9206,1926,85,0,147,12,709,799,9721,25,0,29,0,0,0,6,0,0,0,0,0,0,0,0,0,0,65,1066,321,156,0,0,2458],"7-22":[4288,232,47,0,0,0,14,1840,55916,4023,961,77,0,2514,899,12511,4426,1997,232,0,200,16,1053,194,9969,75,0,37,0,0,0,6,0,0,0,0,0,0,0,0,0,0,40,1027,205,132,0,0,2691],"7-23":[4571,58,63,0,0,0,12,2460,48559,7099,1948,51,0,3040,1272,7900,7102,2957,36,0,229,22,560,537,10185,29,0,36,0,0,0,6,0,0,0,0,0,0,0,0,0,0,54,941,117,193,0,0,2850],"7-24":[4657,28,40,0,0,0,11,3122,45903,10867,1419,22,0,1330,1416,7028,9026,2155,16,0,173,37,681,382,10197,23,0,48,0,0,0,6,0,0,0,0,0,0,0,0,0,0,59,1164,213,107,0,0,2498],"7-25":[4466,102,61,0,0,0,13,2480,47856,10746,1368,0,0,1085,1076,6647,10508,1782,2,0,142,23,806,547,9969,0,0,24,0,0,0,6,0,0,0,0,0,0,0,0,0,0,56,1479,316,112,0,0,2113],"7-26":[4627,37,62,1,0,0,10,2774,46543,11502,1181,0,0,1189,1281,5429,11295,1632,4,0,148,30,545,1052,9566,6,0,40,0,0,0,6,0,0,0,0,0,0,0,0,0,0,76,1358,400,111,0,0,2073],"7-27":[4707,15,35,0,0,0,10,3814,41472,13273,1123,7,0,1926,1839,3869,12246,1383,2,0,179,41,405,1460,9191,10,0,41,0,0,0,6,0,0,0,0,0,0,0,0,0,0,100,1061,335,129,0,0,2329],"7-28":[4497,68,123,2,0,0,6,2838,44848,13995,1652,1,0,319,1303,7055,9098,2652,0,0,45,47,536,2084,8642,4,0,7,0,0,0,6,0,0,0,0,0,0,0,0,0,0,115,2006,185,180,0,0,1643],"7-29":[4679,100,39,1,0,0,6,4462,30853,20497,1482,4,0,2910,2107,4117,11647,1753,14,0,158,50,306,1827,8975,33,0,38,0,0,0,6,0,0,0,0,0,0,0,0,0,0,115,876,403,177,0,0,2318],"7-30":[4787,6,32,2,0,0,7,5239,30862,21664,1690,79,0,518,2430,2688,12474,2046,9,0,125,70,244,1530,9340,41,0,19,0,0,0,6,0,0,0,0,0,0,0,0,0,0,186,999,415,188,0,0,1912],"8-9":[4253,82,152,2,0,0,5,494,55249,8966,296,0,0,355,499,2521,19128,417,2,0,182,2,393,1120,9150,6,0,11,0,0,0,1,0,0,0,0,0,0,0,0,0,0,26,1348,56,45,0,0,2139],"8-10":[3374,116,781,2,0,0,16,150,49746,14408,580,0,0,520,143,2351,19917,801,0,0,142,2,326,1170,9242,4,0,14,0,0,0,1,0,0,0,0,0,0,0,0,0,0,3,1309,203,46,0,0,1977],"8-11":[4229,43,195,1,0,0,9,710,52600,10245,523,0,0,959,552,4313,15925,900,0,0,159,3,311,1052,9294,1,0,30,0,0,0,0,1,0,0,0,0,0,0,0,0,0,29,1009,152,44,0,0,2228],"8-12":[4397,70,139,2,0,0,6,819,50702,11568,263,0,0,1025,1061,3036,17056,380,0,0,164,4,326,2244,7932,22,0,45,0,0,0,0,1,0,0,0,0,0,0,0,0,0,31,957,194,30,0,0,2263],"8-13":[4352,62,194,2,0,0,6,805,49269,13360,298,0,0,773,1108,2819,17534,491,0,0,146,4,432,1633,8512,30,0,19,0,0,0,0,1,0,0,0,0,0,0,0,0,0,25,1107,263,47,0,0,1972],"8-14":[4403,70,144,0,0,0,9,926,51313,10993,650,0,0,965,1347,5165,13290,1564,0,0,155,6,572,427,9775,1,0,51,0,0,0,1,0,0,0,0,0,0,0,0,0,0,39,919,148,46,0,0,2319],"8-15":[3847,113,470,1,0,0,11,480,49414,12440,1165,0,0,1507,584,4634,14141,2493,0,0,190,3,332,720,9691,0,0,55,0,0,0,1,0,0,0,0,0,0,0,0,0,0,16,585,254,49,0,0,2553],"8-16":[4023,154,289,4,0,0,10,701,49519,10721,1859,2,0,1971,775,5348,11784,3575,3,0,217,5,250,634,9909,0,0,37,0,0,0,1,0,0,0,0,0,0,0,0,0,0,16,656,129,86,0,0,2586],"8-17":[4254,91,207,2,0,0,9,789,51655,9968,1084,1,0,1606,885,6424,11859,2551,5,0,186,5,330,991,9467,2,0,25,0,0,0,1,0,0,0,0,0,0,0,0,0,0,19,1155,111,62,0,0,2211],"8-18":[4335,31,252,0,0,0,12,1212,47126,13498,550,0,0,1636,1322,5479,12478,1810,0,0,154,6,597,752,9396,0,0,46,0,0,0,1,0,0,0,0,0,0,0,0,0,0,29,1025,172,46,0,0,2203],"8-19":[4088,83,475,0,0,0,4,1140,37743,22818,405,0,0,1289,1192,2302,17327,1031,0,0,137,7,257,1542,8800,0,0,80,0,0,0,1,0,0,0,0,0,0,0,0,0,0,44,691,372,41,0,0,2211],"8-20":[4432,125,146,2,0,0,5,1702,44160,15760,818,0,0,1212,1390,2711,16231,1242,0,0,159,8,118,1206,9371,0,0,27,0,0,0,1,0,0,0,0,0,0,0,0,0,0,78,875,277,122,0,0,1978],"8-21":[4437,130,79,0,0,0,7,1678,51321,8862,865,31,0,1963,1397,7897,9094,2205,97,0,177,4,443,750,9503,14,0,33,0,0,0,1,0,0,0,0,0,0,0,0,0,0,66,954,156,104,0,0,2199],"8-22":[4337,206,69,0,0,0,7,1532,55784,4427,918,67,0,2696,1352,13047,4119,2308,236,0,236,5,707,232,9729,80,0,41,0,0,0,1,0,0,0,0,0,0,0,0,0,0,38,882,95,78,1,0,2435],"8-23":[4582,61,51,3,0,0,8,2010,49115,7098,1824,38,0,3264,1923,7567,7324,3407,60,0,277,11,355,451,9917,20,0,40,0,0,0,1,0,0,0,0,0,0,0,0,0,0,47,801,72,109,0,0,2547],"8-24":[4681,29,40,2,0,0,6,2594,46228,11268,1221,24,0,1623,2160,6986,8833,2632,19,0,177,12,493,316,9908,19,0,54,0,0,0,1,0,0,0,0,0,0,0,0,0,0,54,1043,141,57,0,0,2177],"8-25":[4498,105,60,0,0,0,6,2073,47767,11468,1200,0,0,1312,1653,7124,9996,2220,2,0,146,10,589,500,9690,0,0,27,0,0,0,1,0,0,0,0,0,0,0,0,0,0,49,1269,207,72,0,0,1894],"8-26":[4643,36,65,1,0,0,6,2270,46697,12081,1048,0,0,1395,1960,5500,11117,1963,4,0,136,16,381,905,9382,8,0,36,0,0,0,1,0,0,0,0,0,0,0,0,0,0,68,1157,262,69,0,0,1882],"8-27":[4745,13,27,1,0,0,7,3254,41672,13672,1063,3,0,2239,2618,3791,12328,1659,5,0,167,21,259,1326,9002,11,0,40,0,0,0,1,0,0,0,0,0,0,0,0,0,0,82,990,215,86,0,0,2032],"8-28":[4544,81,93,5,0,0,5,2520,45173,14122,1602,1,0,435,1763,7099,9178,3042,0,0,83,17,261,2101,8356,4,0,8,0,0,0,1,0,0,0,0,0,0,0,0,0,0,113,1741,152,92,0,0,1444],"8-29":[4697,101,36,7,0,0,6,3897,31210,20919,1418,5,0,3150,2893,3852,11785,2060,14,0,173,24,156,1657,8792,34,0,43,0,0,0,1,0,0,0,0,0,0,0,0,0,0,112,782,287,117,0,0,2010],"8-30":[4821,2,29,3,0,0,6,4689,31238,22096,1559,80,0,738,3184,2449,12521,2444,18,0,119,28,145,1336,9138,34,0,18,0,0,0,1,0,0,0,0,0,0,0,0,0,0,173,886,270,120,0,0,1660],"9-10":[4282,111,1353,0,0,0,51,14,50923,7607,323,0,0,440,15,2765,28175,869,0,0,33,0,57,456,9545,0,0,3,0,0,0,4,4,0,0,0,0,0,0,0,0,0,0,401,21,7,0,0,2327],"9-11":[5895,63,321,0,0,0,14,264,51624,5783,283,0,0,1142,309,6372,21864,1277,0,0,18,0,93,564,9284,2,0,21,0,0,0,8,0,0,0,0,0,0,0,0,0,0,3,254,99,4,0,0,2379],"9-12":[6169,104,197,0,0,0,9,274,50313,6627,122,0,0,1233,774,4576,23930,444,0,0,17,0,143,1545,8102,17,0,37,0,0,3,2,2,0,0,0,0,0,0,0,0,0,6,223,127,3,0,0,2383],"9-13":[6103,103,262,0,0,0,10,291,48995,8342,151,0,0,855,769,4306,24474,585,0,0,18,0,221,1014,8658,27,0,6,0,0,0,6,2,0,0,0,0,0,0,0,0,0,3,324,148,4,0,0,2185],"9-14":[6110,103,227,0,0,0,15,377,49793,7020,353,0,0,1250,1079,7745,18430,2018,0,0,28,0,239,130,9680,1,0,38,0,0,0,8,0,0,0,0,0,0,0,0,0,0,20,236,89,9,0,0,2335],"9-15":[5111,178,765,0,0,0,23,184,47242,8644,724,0,0,1946,375,7381,18936,3203,0,0,43,0,165,329,9527,0,0,32,0,0,0,8,0,0,0,0,0,0,0,0,0,0,5,127,121,6,0,0,2449],"9-16":[5406,248,459,2,0,0,21,313,47282,7300,1218,0,0,2479,553,8207,16181,4562,5,0,61,0,93,275,9690,0,0,19,0,0,0,8,0,0,0,0,0,0,0,0,0,0,4,226,64,14,0,0,2440],"9-17":[5752,170,364,2,0,0,17,371,49464,6514,745,1,0,1832,653,9425,16480,3090,5,0,62,0,138,574,9357,1,0,9,0,0,0,8,0,0,0,0,0,0,0,0,0,0,5,427,41,13,0,0,2292],"9-18":[5884,52,412,0,0,0,21,638,45468,9631,297,0,0,1951,1142,7958,17460,2223,0,0,58,0,319,383,9312,0,0,30,0,0,0,8,0,0,0,0,0,0,0,0,0,0,7,373,130,0,0,0,2182],"9-19":[5465,128,724,0,0,0,10,691,37070,17488,216,0,0,1653,1014,3684,23822,1290,0,0,53,0,133,934,8823,0,0,50,0,0,0,8,0,0,0,0,0,0,0,0,0,0,18,153,269,6,0,0,2133],"9-20":[6028,183,238,0,0,0,1,1009,42966,11374,658,0,0,1461,1281,4653,21859,1718,0,0,43,0,34,722,9224,0,0,11,0,0,0,8,0,0,0,0,0,0,0,0,0,0,41,277,198,26,0,0,2035],"9-21":[6023,290,93,0,0,0,2,1017,48283,6341,647,18,0,2270,1312,11522,12620,2759,94,0,78,0,202,424,9328,24,0,15,0,0,0,8,0,0,0,0,0,0,0,0,0,0,29,321,126,25,0,0,2164],"9-22":[5800,414,89,0,0,0,6,949,50896,3293,649,51,0,3019,1270,18545,5743,2893,283,0,129,1,336,75,9568,52,0,16,0,0,0,8,0,0,0,0,0,0,0,0,0,0,11,226,88,15,0,0,2384],"9-23":[6248,101,85,0,0,0,15,1138,46485,4867,1326,26,0,3700,1910,10852,10347,4364,78,0,131,1,134,212,9684,15,0,15,0,0,0,8,0,0,0,0,0,0,0,0,0,0,6,288,39,16,0,0,2448],"9-24":[6459,31,48,0,0,0,8,1611,44201,8428,721,26,0,1923,2142,9762,12591,3531,25,0,94,1,176,161,9664,13,0,35,0,0,0,8,0,0,0,0,0,0,0,0,0,0,17,471,69,7,0,0,2129],"9-25":[6122,152,77,0,0,0,10,1256,45552,8607,772,0,0,1463,1604,10110,13778,2979,2,0,63,0,276,280,9498,0,0,13,0,0,0,8,0,0,0,0,0,0,0,0,0,0,21,499,167,14,0,0,1971],"9-26":[6376,38,104,0,0,0,3,1383,45138,8838,725,0,0,1514,1923,7888,15572,2601,9,0,63,1,172,578,9195,2,0,23,0,0,0,8,0,0,0,0,0,0,0,0,0,0,32,410,202,6,0,0,1982],"9-27":[6548,9,32,0,0,0,6,2038,40876,9926,853,0,0,2465,2759,5521,17303,2093,6,0,105,1,89,925,8863,13,0,26,0,0,0,8,0,0,0,0,0,0,0,0,0,0,39,356,184,15,0,0,2012],"9-28":[6141,105,183,4,0,0,1,1632,43219,11132,1129,1,0,539,1818,9782,13192,3731,0,0,34,0,121,1580,8284,4,0,3,0,0,0,8,0,0,0,0,0,0,0,0,0,0,69,1059,63,24,0,0,1489],"9-29":[6422,137,26,4,0,0,3,2675,30565,16571,1129,6,0,3513,3059,5011,17174,2740,18,0,86,1,78,1202,8589,29,0,39,0,0,0,8,0,0,0,0,0,0,0,0,0,0,47,339,219,29,0,0,1906],"9-30":[6613,0,18,0,0,0,0,3249,31361,17391,1190,83,0,905,3500,3148,18173,3194,17,0,49,1,83,925,8912,32,0,11,0,0,0,8,0,0,0,0,0,0,0,0,0,0,102,303,225,30,0,0,1726],"10-11":[4331,15,18,0,0,0,0,258,50136,2632,117,0,0,880,1428,7839,26552,948,0,0,112,0,213,653,9856,2,0,26,0,0,0,4,0,0,0,0,0,0,0,0,0,0,42,147,109,6,0,0,2441],"10-12":[4338,38,12,0,0,0,0,286,47867,4033,79,0,0,1081,2141,6569,27098,471,0,0,81,0,307,2072,8170,19,0,31,0,0,0,2,2,0,0,0,0,0,0,0,0,0,40,244,126,6,0,0,2336],"10-13":[4334,35,17,0,0,0,0,255,47656,4811,72,0,0,645,2169,5317,28917,584,0,0,130,2,410,1399,8813,27,0,7,0,0,0,2,2,0,0,0,0,0,0,0,0,0,37,348,132,7,0,0,2164],"10-14":[4378,10,1,0,0,0,0,318,47509,4352,183,0,0,1036,2532,9730,22103,1793,0,0,197,2,464,186,10208,1,0,35,0,0,0,4,0,0,0,0,0,0,0,0,0,0,55,311,100,4,0,0,2226],"10-15":[4323,14,17,0,0,0,0,177,45779,5364,454,0,0,1772,880,8996,24632,2908,0,0,137,0,341,319,10190,0,0,28,0,0,0,4,0,0,0,0,0,0,0,0,0,0,27,162,100,20,0,0,2430],"10-16":[4226,47,43,0,0,0,0,294,45387,4695,852,0,0,2178,1381,10385,20415,4295,5,0,241,0,220,245,10442,0,0,17,0,0,0,4,0,0,0,0,0,0,0,0,0,0,35,223,64,35,0,0,2409],"10-17":[4308,22,13,0,0,0,2,343,47678,3674,534,1,0,1533,1674,11358,20806,2775,6,0,227,0,290,612,9989,1,0,6,0,0,0,4,0,0,0,0,0,0,0,0,0,0,36,408,52,20,0,0,2278],"10-18":[4349,8,20,0,0,0,4,560,43711,6752,182,0,0,1625,2454,9581,21587,1990,0,0,260,3,600,435,9768,0,0,29,0,0,0,4,0,0,0,0,0,0,0,0,0,0,38,377,133,1,0,0,2176],"10-19":[4215,16,132,0,0,0,0,589,36401,13553,121,0,0,1376,2081,4353,29441,1108,0,0,268,1,268,1195,9185,0,0,58,0,0,0,4,0,0,0,0,0,0,0,0,0,0,46,188,302,7,0,0,2064],"10-20":[4367,6,10,0,0,0,0,877,42124,7711,476,0,0,1188,2772,5701,26334,1556,0,0,258,1,85,1047,9649,0,0,17,0,0,0,4,0,0,0,0,0,0,0,0,0,0,84,329,211,27,0,0,1948],"10-21":[4334,41,2,0,0,0,0,879,46096,3831,443,5,0,1929,2865,14142,15355,2686,83,0,311,2,405,593,9730,55,0,20,0,0,0,4,0,0,0,0,0,0,0,0,0,0,70,368,125,16,0,0,2097],"10-22":[4264,62,3,0,0,0,0,831,47574,1930,441,23,0,2627,2666,22681,7312,2866,270,0,415,1,687,125,9925,96,0,22,0,0,0,4,0,0,0,0,0,0,0,0,0,0,51,301,65,21,0,0,2299],"10-23":[4356,12,1,0,0,0,3,995,43894,3327,937,7,0,3203,3838,13673,12060,4363,96,0,485,1,248,360,10223,19,0,22,0,0,0,4,0,0,0,0,0,0,0,0,0,0,47,318,31,23,0,0,2372],"10-24":[4394,0,1,0,0,0,0,1382,41944,6365,513,18,0,1533,4384,11985,14833,3428,26,0,352,3,363,301,10133,20,0,47,0,0,0,4,0,0,0,0,0,0,0,0,0,0,59,472,74,14,0,0,2074],"10-25":[4337,16,2,0,0,0,0,1093,43797,5806,551,0,0,1111,3407,12008,16971,2852,2,0,306,2,479,420,9961,0,0,12,0,0,0,4,0,0,0,0,0,0,0,0,0,0,54,474,189,30,0,0,1933],"10-26":[4382,3,2,0,0,0,0,1205,43471,5948,544,0,0,1169,3981,9514,18562,2554,4,0,333,3,330,875,9504,6,0,24,0,0,0,4,0,0,0,0,0,0,0,0,0,0,67,438,209,19,0,0,1913],"10-27":[4400,2,1,0,0,0,0,1750,39625,7075,601,0,0,2044,5257,6613,20186,2107,4,0,377,4,159,1307,9176,15,0,30,0,0,0,4,0,0,0,0,0,0,0,0,0,0,78,322,174,22,0,0,2013],"10-28":[4310,32,10,0,0,0,0,1390,40697,9045,823,1,0,403,3791,12461,15290,3946,0,0,128,2,214,1943,8629,4,0,7,0,0,0,4,0,0,0,0,0,0,0,0,0,0,125,1009,66,24,0,0,1487],"10-29":[4347,45,0,0,0,0,0,2301,29397,13888,765,8,0,3098,5659,6530,19649,2954,17,0,371,5,137,1648,8884,27,0,34,0,0,0,4,0,0,0,0,0,0,0,0,0,0,105,347,223,25,0,0,1881],"10-30":[4402,0,2,0,0,0,0,2766,30495,14482,865,65,0,569,6417,4075,21068,3315,15,0,283,6,117,1299,9244,53,0,22,0,0,0,4,0,0,0,0,0,0,0,0,0,0,170,335,209,32,0,0,1700],"11-12":[6566,116,180,0,0,0,2,108,52942,4574,42,0,0,528,718,2224,25520,258,0,0,57,3,214,2065,8407,21,0,24,0,0,0,0,2,0,0,0,0,0,0,0,0,0,3,486,46,7,0,0,3006],"11-13":[6333,164,286,0,0,0,2,139,49249,8125,65,0,0,367,800,3421,23603,512,0,0,79,2,347,1605,8810,29,0,6,0,0,0,0,2,0,0,0,0,0,0,0,0,0,4,825,75,13,0,0,2523],"11-14":[6365,158,228,0,0,0,6,195,49508,7457,237,0,0,653,1109,7335,17280,1818,0,0,104,3,438,471,10037,1,0,28,0,0,0,2,0,0,0,0,0,0,0,0,0,0,20,640,40,6,0,0,2743],"11-15":[5279,292,759,0,0,0,19,108,48097,7929,506,0,0,1249,355,6002,19075,2920,0,0,131,1,378,543,10011,0,0,31,0,0,0,2,0,0,0,0,0,0,0,0,0,0,7,356,112,45,0,0,2927],"11-16":[5573,327,473,3,0,0,16,207,48212,6785,923,0,0,1679,559,6874,16197,4265,5,0,180,3,250,493,10221,0,0,13,0,0,0,2,0,0,0,0,0,0,0,0,0,0,8,372,54,85,0,0,2915],"11-17":[5920,262,361,2,0,0,16,259,50539,5786,568,1,0,1178,661,7928,16505,2793,6,0,178,1,254,920,9793,1,0,6,0,0,0,2,0,0,0,0,0,0,0,0,0,0,11,775,42,56,0,0,2634],"11-18":[6168,95,402,0,0,0,19,426,47372,8071,223,0,0,1282,1196,6082,18371,1879,0,0,168,2,463,709,9746,0,0,27,0,0,0,2,0,0,0,0,0,0,0,0,0,0,15,710,97,20,0,0,2608],"11-19":[5702,195,748,0,0,0,2,517,38096,16575,107,0,0,1044,1051,2434,23629,1196,0,0,143,2,212,1533,9044,0,0,49,0,0,0,2,0,0,0,0,0,0,0,0,0,0,20,482,239,23,0,0,2540],"11-20":[6260,272,216,0,0,0,3,725,44883,9852,431,0,0,944,1451,2419,22512,1575,0,0,147,2,82,1243,9553,0,0,15,0,0,0,2,0,0,0,0,0,0,0,0,0,0,52,703,145,91,0,0,2296],"11-21":[6238,351,99,2,0,0,1,715,50244,4852,417,11,0,1638,1509,9024,13467,2621,88,0,206,4,386,805,9647,40,0,18,0,0,0,2,0,0,0,0,0,0,0,0,0,0,43,762,53,72,0,0,2494],"11-22":[5971,496,86,1,0,0,5,662,52943,2205,444,45,0,2285,1466,15696,6577,2758,256,0,284,2,709,264,9871,74,0,18,0,0,0,2,0,0,0,0,0,0,0,0,0,0,25,586,48,54,0,0,2739],"11-23":[6523,147,69,0,0,0,15,727,48196,4327,957,23,0,2818,2156,8986,10330,4270,80,0,326,5,271,572,10065,15,0,14,0,0,0,2,0,0,0,0,0,0,0,0,0,0,22,516,22,76,0,0,2884],"11-24":[6770,49,32,0,0,0,3,1053,45659,7962,600,24,0,1303,2528,8074,12370,3321,27,0,212,4,336,561,10001,13,0,36,0,0,0,2,0,0,0,0,0,0,0,0,0,0,33,800,46,28,0,0,2470],"11-25":[6370,190,95,0,0,0,4,812,46602,8079,616,0,0,955,1934,8570,13438,2855,2,0,152,6,467,703,9769,0,0,12,0,0,0,2,0,0,0,0,0,0,0,0,0,0,32,955,121,53,0,0,2228],"11-26":[6678,51,109,0,0,0,3,889,47158,7273,646,1,0,1042,2227,5571,16147,2443,9,0,178,6,322,1151,9385,2,0,21,0,0,0,2,0,0,0,0,0,0,0,0,0,0,54,949,120,33,0,0,2200],"11-27":[6890,15,26,0,0,0,0,1377,42304,9347,665,0,0,1821,3191,3982,16845,2048,13,0,246,22,174,1511,9053,6,0,25,0,0,0,2,0,0,0,0,0,0,0,0,0,0,53,707,119,53,0,0,2393],"11-28":[6366,142,201,3,0,0,1,1100,44978,9867,1057,1,0,275,2257,7361,13592,3534,0,0,86,10,227,2148,8483,4,0,3,0,0,0,2,0,0,0,0,0,0,0,0,0,0,88,1612,67,48,0,0,1615],"11-29":[6757,137,26,6,0,0,3,1907,32437,15922,899,17,0,2910,3563,3154,16979,2625,15,0,208,26,101,1799,8850,21,0,30,0,0,0,2,0,0,0,0,0,0,0,0,0,0,84,623,173,64,0,0,2255],"11-30":[6939,5,21,0,0,0,0,2423,32393,17429,965,90,0,483,4090,1949,17485,2995,8,0,153,34,91,1421,9233,37,0,14,0,0,0,2,0,0,0,0,0,0,0,0,0,0,144,707,173,71,0,0,1924],"12-13":[7477,88,281,0,0,0,0,77,50549,4497,95,0,0,179,207,2730,29374,934,1,0,61,0,111,303,8278,20,0,0,0,0,0,10,10,0,0,0,0,0,0,0,0,0,3,666,58,27,0,0,2823],"12-14":[7311,171,237,0,0,0,6,183,49077,4998,252,0,0,525,502,7855,20348,3171,0,0,120,0,146,59,8543,1,0,22,0,0,0,23,0,0,0,0,0,0,0,0,0,0,22,579,63,24,0,0,2858],"12-15":[5704,288,1160,3,0,0,22,118,46891,6178,573,0,0,1025,144,7115,20397,4468,0,0,147,0,168,216,8319,0,0,19,0,0,0,23,0,0,0,0,0,0,0,0,0,0,6,321,71,26,0,0,3141],"12-16":[6101,334,789,6,0,0,18,222,46627,5427,979,0,0,1473,274,8132,17366,5943,5,0,196,0,126,159,8456,0,0,11,0,0,0,23,0,0,0,0,0,0,0,0,0,0,7,375,52,51,0,0,3099],"12-17":[6556,291,563,4,0,0,24,236,49095,4280,617,0,0,986,343,8877,18374,4257,5,0,206,0,152,342,8227,3,0,8,0,0,0,23,0,0,0,0,0,0,0,0,0,0,8,774,31,38,0,0,2806],"12-18":[7040,111,476,0,0,0,14,406,45698,6777,221,0,0,1176,641,7346,20255,3236,0,0,192,0,247,184,8278,0,0,24,0,0,0,23,0,0,0,0,0,0,0,0,0,0,9,748,87,16,0,0,2686],"12-19":[6515,164,888,0,0,0,2,475,37257,14526,163,0,0,930,536,3116,26546,2140,0,0,185,0,116,572,7942,0,0,33,0,0,0,22,0,0,0,0,0,0,0,0,0,0,23,477,256,11,0,0,2649],"12-20":[7159,205,368,0,0,0,2,667,43653,8248,560,0,0,777,881,3506,24905,2655,0,0,204,0,39,420,8241,0,0,4,0,0,0,23,0,0,0,0,0,0,0,0,0,0,49,677,174,80,0,0,2441],"12-21":[7086,413,166,2,0,0,2,643,47939,4230,529,19,0,1486,962,11010,14684,3794,117,0,242,0,202,229,8268,8,0,5,0,0,0,23,0,0,0,0,0,0,0,0,0,0,37,703,93,70,0,0,2629],"12-22":[6763,629,110,0,0,0,8,602,50022,1939,545,42,0,2084,932,18455,7081,4041,339,0,333,1,268,54,8401,15,0,5,0,0,0,23,0,0,0,0,0,0,0,0,0,0,19,549,51,44,0,0,2919],"12-23":[7496,171,97,0,0,0,13,674,45999,3526,1050,29,0,2671,1467,10705,11720,5660,73,0,344,1,99,114,8507,15,0,11,0,0,0,23,0,0,0,0,0,0,0,0,0,0,12,535,17,85,0,0,3015],"12-24":[7742,72,59,0,0,0,2,992,43707,6822,672,28,0,1243,1826,9651,14004,4740,26,0,238,1,122,139,8455,10,0,29,0,0,0,23,0,0,0,0,0,0,0,0,0,0,30,876,57,27,0,0,2504],"12-25":[7200,271,136,0,0,0,4,784,44841,6768,669,0,0,878,1324,9963,15259,4122,2,0,203,0,182,204,8370,0,0,4,0,0,0,23,0,0,0,0,0,0,0,0,0,0,30,1038,149,44,0,0,2269],"12-26":[7602,95,149,0,0,0,4,875,45333,6229,630,0,0,907,1527,7002,18113,3587,9,0,232,1,159,373,8179,1,0,9,0,0,0,23,0,0,0,0,0,0,0,0,0,0,44,954,160,23,0,0,2297],"12-27":[7902,28,47,0,0,0,0,1324,40880,7924,733,0,0,1751,2422,4998,19408,2945,12,0,277,0,81,577,7990,8,0,8,0,0,0,23,0,0,0,0,0,0,0,0,0,0,45,766,144,47,0,0,2423],"12-28":[7128,188,355,6,0,0,1,1053,42595,9169,969,1,0,248,1694,9119,15420,4348,4,0,107,0,100,886,7724,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,0,0,72,1722,59,58,0,0,1643],"12-29":[7820,122,43,13,0,0,2,1836,30902,14482,943,5,0,2838,2723,4324,19591,3457,27,0,255,1,45,721,7884,21,0,14,0,0,0,23,0,0,0,0,0,0,0,0,0,0,72,686,197,66,0,0,2292],"12-30":[8008,4,33,0,0,0,0,2288,31450,15576,971,74,0,412,3265,2659,20321,4011,36,0,198,1,34,498,8150,18,0,8,0,0,0,23,0,0,0,0,0,0,0,0,0,0,136,743,189,70,0,0,1957],"13-14":[7542,124,135,0,0,0,6,127,49936,3136,307,0,0,563,483,7755,23386,2368,0,0,108,0,136,25,9352,1,0,33,0,0,0,31,0,0,0,0,0,0,0,0,0,0,18,151,30,8,0,0,2823],"13-15":[5749,225,1163,2,0,0,21,75,46922,4596,761,0,0,1271,185,7586,22648,3560,0,0,175,0,155,209,9096,0,0,29,0,0,0,31,0,0,0,0,0,0,0,0,0,0,4,112,92,10,0,0,2833],"13-16":[6130,274,780,11,0,0,17,171,46229,4301,1255,0,0,1651,313,9094,19000,4974,5,0,267,0,112,176,9224,0,0,6,0,0,0,31,0,0,0,0,0,0,0,0,0,0,6,154,49,21,0,0,2789],"13-17":[6612,218,557,6,0,0,25,183,48870,3198,786,1,0,955,364,9825,20080,3406,5,0,260,0,153,355,8971,2,0,5,0,0,0,31,0,0,0,0,0,0,0,0,0,0,9,330,39,17,0,0,2682],"13-18":[7111,88,422,0,0,0,18,343,45622,5797,290,0,0,1121,677,8033,21878,2466,0,0,230,0,263,172,9040,0,0,25,0,0,0,31,0,0,0,0,0,0,0,0,0,0,11,291,70,2,0,0,2621],"13-19":[6605,149,806,0,0,0,2,409,37063,13251,257,0,0,1053,531,3699,28546,1437,0,0,192,0,123,649,8588,0,0,49,0,0,1,30,0,0,0,0,0,0,0,0,0,0,27,178,216,8,0,0,2460],"13-20":[7210,165,356,0,0,0,3,620,43141,7279,800,0,0,801,929,4579,26467,1835,0,0,213,0,31,448,8949,0,0,9,0,0,0,31,0,0,0,0,0,0,0,0,0,0,47,324,132,19,0,0,2351],"13-21":[7180,342,163,2,0,0,2,575,47217,3403,751,22,0,1541,995,12607,15778,2881,112,0,272,0,186,201,9063,8,0,9,0,0,0,30,1,0,0,0,0,0,0,0,0,0,32,375,55,21,0,0,2504],"13-22":[6900,524,97,1,0,0,12,539,48870,1496,765,42,0,2136,935,20652,7657,3137,337,0,397,1,255,47,9172,17,0,7,0,0,0,31,0,0,0,0,0,0,0,0,0,0,14,249,43,12,0,0,2740],"13-23":[7545,132,112,0,0,0,15,640,44689,3198,1335,33,0,2733,1524,12719,12159,4694,72,0,426,1,76,106,9308,13,0,1,0,0,0,31,0,0,0,0,0,0,0,0,0,0,17,260,18,23,0,0,2810],"13-24":[7753,70,64,1,0,0,2,986,42706,6184,894,24,0,1276,1883,11200,14941,3811,34,0,287,1,135,136,9199,3,0,21,0,0,0,31,0,0,0,0,0,0,0,0,0,0,29,488,44,9,0,0,2368],"13-25":[7218,286,124,0,0,0,3,764,44765,5453,837,0,0,822,1382,10555,17194,3310,2,0,255,0,185,249,9069,0,0,2,0,0,0,31,0,0,0,0,0,0,0,0,0,0,25,584,137,13,0,0,2212],"13-26":[7660,93,120,2,0,0,5,821,44708,5453,827,0,0,842,1602,8260,19288,2832,10,0,296,1,173,423,8833,1,0,9,0,0,0,31,0,0,0,0,0,0,0,0,0,0,38,517,133,3,0,0,2240],"13-27":[7939,19,52,0,0,0,0,1285,40594,6872,886,0,0,1717,2492,5827,20837,2253,12,0,370,1,57,695,8628,8,0,7,0,0,0,31,0,0,0,0,0,0,0,0,0,0,41,380,123,19,0,0,2306],"13-28":[7239,161,329,8,0,0,1,1005,41313,9157,898,5,0,195,1686,11295,15449,3983,0,0,147,0,81,1084,8290,0,0,0,0,0,0,31,0,0,0,0,0,0,0,0,0,0,63,1232,44,23,0,0,1629],"13-29":[7841,119,50,18,0,0,2,1803,29735,14008,1093,9,0,2869,2825,6055,20213,2840,24,0,317,1,47,851,8481,19,0,22,0,0,0,31,0,0,0,0,0,0,0,0,0,0,62,401,172,17,0,0,2171],"13-30":[8051,6,30,2,0,0,0,2252,30739,14838,1159,82,0,340,3370,3841,21373,3303,30,0,242,1,25,606,8788,17,0,8,0,0,0,31,0,0,0,0,0,0,0,0,0,0,105,385,155,17,0,0,1960],"14-15":[5981,185,1430,2,0,0,26,41,50320,5570,1473,0,0,900,68,4555,20659,706,0,0,112,0,291,515,11502,0,0,21,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,117,161,24,0,0,3313],"14-16":[6428,246,963,15,0,0,27,99,48153,5958,2538,0,0,1379,180,7407,16473,1236,5,0,154,0,161,376,11845,0,0,12,0,0,0,1,0,0,0,0,0,0,0,0,0,0,3,249,52,54,0,0,3240],"14-17":[6901,235,660,7,0,0,38,143,51097,5174,1337,5,0,787,188,7569,17094,757,0,0,174,0,261,790,11283,3,0,12,0,0,1,0,0,0,0,0,0,0,0,0,0,0,10,579,54,51,0,0,2955],"14-18":[7549,100,446,0,0,0,28,307,47104,8540,506,0,0,935,362,6333,18086,456,0,0,140,0,605,559,11087,0,0,21,0,0,0,1,0,0,0,0,0,0,0,0,0,0,14,506,91,17,0,0,2936],"14-19":[7017,140,873,0,0,0,7,374,37261,17815,314,0,0,781,282,3333,22255,164,0,0,117,0,234,1788,10048,0,0,40,0,0,0,1,0,0,0,0,0,0,0,0,0,0,23,304,223,11,0,0,2882],"14-20":[7703,147,382,0,0,0,6,594,43331,11681,921,0,0,610,535,4238,20546,245,0,0,133,0,54,1498,10648,0,0,4,0,0,0,1,0,0,0,0,0,0,0,0,0,0,39,472,154,62,0,0,2709],"14-21":[7627,371,189,3,0,0,11,556,49662,5036,1274,46,0,1327,667,9970,13502,593,32,0,163,0,509,599,11034,66,0,14,0,0,0,1,0,0,0,0,0,0,0,0,0,0,27,514,63,72,0,0,2901],"14-22":[7350,584,115,0,0,0,22,527,52793,1729,1326,138,0,1960,587,16191,7337,691,121,0,268,1,742,100,11286,128,0,19,0,0,0,1,0,0,0,0,0,0,0,0,0,0,12,414,37,45,0,0,3102],"14-23":[8025,152,121,1,0,0,24,651,47176,4070,2502,67,0,2547,1081,10238,10984,1212,23,0,282,1,221,303,11792,28,0,16,0,0,0,1,0,0,0,0,0,0,0,0,0,0,26,369,23,60,0,0,3196],"14-24":[8283,76,78,0,0,0,8,1012,45683,6830,1803,33,0,1113,1370,8158,14068,687,2,0,165,2,314,287,11665,29,0,28,0,0,0,1,0,0,0,0,0,0,0,0,0,0,22,705,38,29,0,0,2771],"14-25":[7657,309,169,0,0,0,10,775,47255,6686,1662,0,0,743,1013,7563,15575,521,0,0,142,1,585,402,11347,2,0,7,0,0,0,1,0,0,0,0,0,0,0,0,0,0,18,876,120,43,0,0,2497],"14-26":[8188,86,148,2,0,0,10,834,46384,7353,1578,0,0,751,1108,6484,16364,426,0,0,144,1,357,1045,10740,12,0,17,0,0,0,1,0,0,0,0,0,0,0,0,0,0,39,783,118,28,0,0,2544],"14-27":[8500,28,49,0,0,0,7,1349,41543,9579,1392,5,0,1595,1880,4799,16870,342,0,0,196,1,145,1617,10321,15,0,20,0,0,0,1,0,0,0,0,0,0,0,0,0,0,42,590,111,42,0,0,2666],"14-28":[7729,179,366,6,0,0,2,1002,42560,11408,1824,1,0,168,1231,9889,12012,1458,0,0,61,2,197,2120,9962,4,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,65,1585,42,75,0,0,1803],"14-29":[8419,116,47,18,0,0,9,1919,30413,16852,1783,16,0,2694,2129,5325,16043,844,2,0,150,1,126,2010,9987,33,0,24,0,0,0,0,1,0,0,0,0,0,0,0,0,0,53,529,169,41,0,0,2604],"14-30":[8641,7,31,3,0,0,0,2423,31269,17465,2085,86,0,241,2576,3151,17820,751,6,0,119,6,97,1406,10681,43,0,14,0,0,0,1,0,0,0,0,0,0,0,0,0,0,98,581,139,73,0,0,2271],"15-16":[5743,80,177,0,0,0,1,83,51596,2588,1144,0,0,618,643,4691,22605,844,5,0,115,0,92,146,13740,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,283,16,73,0,0,4207],"15-17":[5905,62,91,2,0,0,10,103,51944,3148,504,5,0,412,850,6248,20821,581,0,0,140,0,747,658,12416,2,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,1048,21,35,0,0,3482],"15-18":[6019,25,77,0,0,0,10,300,45852,7621,228,0,0,631,1421,6276,19567,461,0,0,155,0,1188,1046,11360,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,1050,78,14,0,0,3297],"15-19":[5797,41,254,0,0,0,1,319,36750,16244,146,0,0,385,1111,3325,24021,193,0,0,163,2,445,2789,10182,0,0,47,0,0,0,0,0,0,0,0,0,0,0,0,0,0,36,700,269,9,0,0,3211],"15-20":[6137,18,22,0,0,0,0,552,42890,9943,503,0,0,396,1617,4269,21778,427,0,0,183,0,98,2689,10835,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,59,1020,193,78,0,0,2864],"15-21":[6036,86,18,0,0,0,0,510,49426,3863,461,16,0,884,1799,9714,14583,897,43,0,214,0,864,1079,11528,84,0,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,40,933,75,84,0,0,3265],"15-22":[5853,158,18,0,0,0,2,420,52097,1466,492,43,0,1413,1743,16327,7753,1092,159,0,317,1,1547,183,11701,183,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,763,29,53,1,0,3610],"15-23":[6086,43,9,0,0,0,3,661,46787,3646,1306,48,0,1926,2522,10099,11236,1692,41,0,359,2,500,678,12523,28,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,669,27,84,0,0,3738],"15-24":[6166,10,7,0,0,0,0,1070,43832,7095,779,27,0,766,2963,8871,13424,1233,4,0,248,2,840,657,12119,33,0,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,40,1251,48,29,0,0,3003],"15-25":[6067,38,8,0,0,0,0,794,45305,6814,714,0,0,533,2127,8787,15094,1048,0,0,224,0,1096,900,11707,2,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,34,1503,145,46,0,0,2645],"15-26":[6136,11,22,0,0,0,0,842,45186,6704,668,1,0,545,2629,6816,16285,950,0,0,236,1,534,1884,11092,11,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,1353,169,22,0,0,2700],"15-27":[6196,5,4,0,0,0,0,1378,40661,8712,748,2,0,1223,3745,4905,16651,687,0,0,280,7,270,2577,10563,18,0,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,64,1030,153,47,0,0,2972],"15-28":[5929,66,81,3,0,0,0,1003,41637,9995,1528,0,0,75,2622,9766,12855,1616,1,0,113,2,425,3050,10148,4,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,96,2312,88,81,0,0,1847],"15-29":[6126,61,9,0,0,0,0,1898,30391,15407,1019,11,0,2394,4112,4692,16166,1571,5,0,279,10,217,3183,10047,38,0,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,91,979,231,64,0,0,2767],"15-30":[6202,0,10,0,0,0,0,2364,30388,16713,1289,67,0,169,4808,3136,17283,1270,10,0,231,17,228,2416,10855,57,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,152,1177,234,84,0,0,2217],"16-17":[6520,104,167,0,0,0,13,115,53156,3451,194,5,0,304,428,4134,19732,289,0,0,48,0,1756,971,13187,3,0,5,0,0,3,2,0,0,0,0,0,0,0,0,0,0,4,1227,30,15,0,0,3833],"16-18":[6559,41,184,0,0,0,15,314,45535,8951,165,0,0,576,964,5510,16988,249,0,0,49,2,2219,1668,11722,0,0,41,0,0,5,0,0,0,0,0,0,0,0,0,0,0,11,1259,103,5,0,0,3528],"16-19":[6191,101,439,0,0,0,1,326,36654,17292,88,0,0,421,798,2830,20605,141,0,0,51,4,786,4257,10337,0,0,104,0,2,3,0,0,0,0,0,0,0,0,0,0,0,33,981,355,9,0,0,3270],"16-20":[6546,107,162,0,0,0,0,583,42618,11082,354,0,0,474,1265,3880,18316,340,0,0,77,2,216,4296,11176,0,0,31,0,2,3,0,0,0,0,0,0,0,0,0,0,0,57,1376,261,44,0,0,2899],"16-21":[6496,216,65,0,0,0,1,597,49248,4936,331,12,0,923,1306,8567,12528,608,22,0,96,0,1675,1641,12084,112,0,58,0,2,3,0,0,0,0,0,0,0,0,0,0,0,48,1273,114,43,0,0,3363],"16-22":[6309,323,32,0,0,0,2,475,52597,1951,366,45,0,1376,1272,13938,6940,771,101,0,173,1,2851,294,12251,249,0,70,0,5,0,0,0,0,0,0,0,0,0,0,0,0,19,1053,53,33,0,0,3803],"16-23":[6708,70,49,0,0,0,7,749,47115,4413,995,36,0,1896,1901,8887,9837,1138,33,0,175,4,1047,1039,13579,50,0,69,0,0,5,0,0,0,0,0,0,0,0,0,0,0,25,919,39,52,0,0,4006],"16-24":[6806,35,29,0,0,0,1,1201,43752,8150,479,15,0,854,2231,7781,11718,818,4,0,110,21,1527,1031,12981,45,0,106,0,0,5,0,0,0,0,0,0,0,0,0,0,0,40,1655,80,13,0,0,3018],"16-25":[6456,158,66,0,0,0,1,915,44845,8079,492,0,0,577,1686,7579,12991,737,0,0,96,1,2203,1252,12339,2,0,13,0,2,3,0,0,0,0,0,0,0,0,0,0,0,36,1847,179,18,0,0,2753],"16-26":[6751,36,71,0,0,0,0,967,44820,7952,482,0,0,579,1958,6204,13877,667,0,0,105,6,1156,2687,11644,12,0,36,0,2,3,0,0,0,0,0,0,0,0,0,0,0,50,1677,224,10,0,0,2798],"16-27":[6885,14,15,0,0,0,0,1568,40484,9588,553,1,0,1278,2833,4384,14476,483,1,0,121,30,638,3650,11043,18,0,68,0,0,5,0,0,0,0,0,0,0,0,0,0,0,55,1339,203,27,0,0,3071],"16-28":[6461,118,146,3,0,0,0,1176,42311,10313,1250,0,0,136,1951,8208,11337,1231,0,0,42,4,746,3989,10969,5,0,13,0,2,2,1,0,0,0,0,0,0,0,0,0,0,87,2809,130,42,0,0,1860],"16-29":[6791,97,19,1,0,0,0,2104,30825,16027,796,9,0,2413,3202,3773,14149,1306,6,0,143,33,388,4421,10552,38,0,94,0,2,3,0,0,0,0,0,0,0,0,0,0,0,80,1210,323,56,0,0,2834],"16-30":[6939,0,15,0,0,0,0,2636,30573,17419,966,39,0,247,3689,2502,15290,996,10,0,94,45,387,3461,11589,84,0,28,0,0,4,1,0,0,0,0,0,0,0,0,0,0,151,1454,323,57,0,0,2261],"17-18":[7218,23,176,0,0,0,6,291,49705,8580,213,0,0,629,580,4186,18328,541,0,0,19,1,1051,979,11347,0,0,33,0,6,0,2,0,0,0,0,0,0,0,0,0,0,18,373,87,0,0,0,3636],"17-19":[6729,88,477,0,0,0,0,311,38139,18716,190,0,0,835,464,2344,21112,382,0,0,40,3,491,2699,9956,0,0,72,0,2,5,1,0,0,0,0,0,0,0,0,0,0,44,538,330,0,0,0,2953],"17-20":[7208,99,134,0,0,0,0,530,44790,12331,598,0,0,672,845,2894,19175,713,0,0,58,2,141,2649,10561,0,0,19,0,3,4,1,0,0,0,0,0,0,0,0,0,0,66,736,237,16,0,0,2802],"17-21":[7168,173,54,0,0,0,1,484,52275,4986,837,30,0,1301,943,7587,13265,935,31,0,82,0,962,1055,11221,84,0,26,0,6,0,2,0,0,0,0,0,0,0,0,0,0,64,777,87,16,0,0,3114],"17-22":[6958,261,47,0,0,0,2,371,55636,1825,859,88,0,1902,937,13567,7144,1175,82,0,141,1,1600,213,11320,213,0,40,0,3,0,4,1,0,0,0,0,0,0,0,0,0,29,627,38,14,1,0,3448],"17-23":[7336,58,33,0,0,0,7,616,49685,4312,1861,50,0,2427,1536,8051,10386,1604,28,0,144,5,525,678,12203,41,0,35,0,2,1,5,0,0,0,0,0,0,0,0,0,0,41,516,25,16,0,0,3628],"17-24":[7441,31,23,0,0,0,1,1049,46748,8074,1057,13,0,1268,1897,6972,12188,1291,5,0,86,6,715,728,11881,43,0,66,0,2,2,3,1,0,0,0,0,0,0,0,0,0,55,1086,55,6,0,0,2746],"17-25":[7057,140,67,0,0,0,2,742,48817,7683,880,0,0,755,1369,6308,13956,1164,0,0,70,3,1056,904,11522,2,0,3,0,1,4,2,0,0,0,0,0,0,0,0,0,0,51,1113,164,4,0,0,2672],"17-26":[7417,16,62,0,0,0,0,846,48020,8240,793,0,0,744,1583,5098,14706,1052,0,0,84,3,548,1779,10957,12,0,21,0,5,2,1,0,0,0,0,0,0,0,0,0,0,69,924,192,4,0,0,2746],"17-27":[7530,12,15,0,0,0,0,1389,42914,10373,845,0,0,1598,2473,3487,15203,804,1,0,108,15,304,2417,10438,19,0,42,0,5,2,1,0,0,0,0,0,0,0,0,0,0,86,702,164,14,0,0,2868],"17-28":[7086,94,159,3,0,0,1,955,44810,11148,1757,1,0,254,1664,7667,11683,1469,0,0,32,3,358,2882,10218,4,0,9,0,2,1,5,0,0,0,0,0,0,0,0,0,0,104,2099,89,11,0,0,1787],"17-29":[7466,77,18,1,0,0,2,1902,31929,17653,1270,2,0,2833,2833,3860,14071,1503,12,0,118,12,267,3005,9912,37,0,45,0,0,3,3,2,0,0,0,0,0,0,0,0,0,113,730,257,23,0,0,2531],"17-30":[7597,0,10,0,0,0,0,2421,31782,19155,1479,46,0,411,3322,2432,15075,1315,8,0,93,17,206,2256,10780,78,0,11,0,2,2,4,0,0,0,0,0,0,0,0,0,0,174,840,242,26,0,0,2160],"18-19":[7615,128,677,0,0,0,0,110,38638,13276,292,0,0,752,189,2139,26998,115,0,0,25,0,136,1617,10098,0,0,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,649,208,17,0,0,3112],"18-20":[8126,167,290,0,0,0,1,183,42371,9760,974,0,0,585,711,4509,22396,467,0,0,69,0,25,1608,10318,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,47,872,143,47,0,0,2859],"18-21":[8002,364,132,0,0,0,3,169,49204,3322,1038,39,0,1213,819,9700,15281,996,34,0,93,0,404,624,10834,70,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,40,868,48,54,0,0,3155],"18-22":[7631,557,109,0,0,0,8,121,51692,1004,1013,75,0,1787,782,16364,8050,1211,167,0,172,1,716,110,11025,144,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,26,708,19,39,0,0,3411],"18-23":[8270,139,118,0,0,0,9,205,46196,3323,2207,58,0,2219,1398,10628,11581,1832,38,0,176,2,263,334,11432,21,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,34,513,18,43,0,0,3678],"18-24":[8487,60,94,0,0,0,3,425,45124,5669,1542,18,0,1150,1827,8202,14701,1282,23,0,92,1,279,473,11249,20,0,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,1061,52,26,0,0,2816],"18-25":[7881,275,188,0,0,0,5,279,46672,5482,1316,0,0,622,1359,7802,16147,1112,0,0,86,2,470,580,10997,2,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,1213,90,33,0,0,2694],"18-26":[8431,69,145,0,0,0,4,324,46793,5267,1185,0,0,633,1469,5802,18135,976,2,0,110,1,183,1202,10511,9,0,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,62,1052,128,21,0,0,2762],"18-27":[8735,20,37,0,0,0,2,654,41746,7770,1219,0,0,1436,2411,4356,18390,709,2,0,158,4,110,1675,10016,18,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,78,788,109,38,0,0,2927],"18-28":[7905,181,350,5,0,0,1,431,42972,9050,1577,1,0,204,1713,8455,14035,2090,0,0,41,2,154,2234,9602,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,94,2156,80,40,0,0,1790],"18-29":[8635,96,50,14,0,0,2,940,31752,14538,1478,7,0,2644,2936,3852,17725,1467,16,0,164,5,75,2205,9573,31,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,110,736,188,40,0,0,2637],"18-30":[8816,7,33,0,0,0,0,1356,31523,16130,1724,73,0,319,3512,2520,18480,1453,17,0,106,10,66,1603,10207,44,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,167,887,164,51,0,0,2190],"19-20":[7976,62,106,0,0,0,1,84,36274,3810,498,0,0,341,1022,10213,31212,1114,0,0,98,0,13,536,9953,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,649,32,91,0,0,3037],"19-21":[7696,252,76,0,0,0,2,189,38427,1677,351,6,0,879,1135,20376,18174,2333,103,0,155,0,208,208,10046,36,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,502,9,88,0,0,3326],"19-22":[7350,368,61,0,0,0,27,155,39303,633,374,20,0,1320,1051,29481,8811,2595,304,0,363,1,284,43,10115,69,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,372,2,72,0,0,3473],"19-23":[7815,108,64,0,0,0,21,270,36070,1895,845,12,0,1835,1854,20518,13675,4197,91,0,449,1,105,125,10297,12,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,303,4,87,0,0,3545],"19-24":[7941,78,57,0,0,0,6,454,34802,3964,458,10,0,775,2454,17924,17341,3344,40,0,179,1,157,182,10133,11,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,758,14,43,0,0,2964],"19-25":[7444,244,136,0,0,0,5,359,36053,3564,456,0,0,499,1822,17783,19267,2785,0,0,150,0,259,272,9996,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,1059,32,66,0,0,2653],"19-26":[7928,67,94,2,0,0,3,383,36922,2744,386,0,0,518,1977,14551,22284,2481,6,0,182,1,149,635,9644,5,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,994,31,46,0,0,2731],"19-27":[8162,29,23,0,0,0,3,628,33776,4036,508,4,0,1112,3138,11282,24010,1909,3,0,325,0,86,901,9371,13,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,697,22,69,0,0,2967],"19-28":[7465,166,246,5,0,0,6,501,33492,6058,720,1,0,77,2185,17406,18349,3734,4,0,74,0,145,1450,8832,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,40,1846,39,88,0,0,1829],"19-29":[8093,94,27,15,0,0,7,866,25273,9607,610,7,0,2174,3733,9550,24539,2759,16,0,417,1,72,1225,9086,30,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,49,745,46,73,0,0,2758],"19-30":[8274,4,19,2,0,0,0,1183,25848,10463,708,61,0,126,4456,7397,25696,3179,36,0,140,2,67,885,9450,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,70,903,46,90,0,0,2316],"20-21":[8917,368,121,0,0,0,8,205,46229,1262,94,2,0,982,319,12943,18464,1946,121,0,62,0,641,278,10911,21,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,293,6,12,0,0,3304],"20-22":[8311,592,134,0,0,0,37,174,46487,577,84,8,0,1682,385,22012,8757,2248,335,0,174,1,792,65,10941,51,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,335,1,8,0,0,3275],"20-23":[8972,221,114,0,0,0,38,355,42584,2351,291,8,0,2222,869,14277,13016,3938,98,0,237,1,308,172,11386,10,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,264,4,11,0,0,3345],"20-24":[9258,124,109,0,0,0,15,642,40143,5318,82,0,0,957,1171,13077,15746,2927,55,0,91,2,457,186,11126,8,0,83,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,629,7,10,0,0,2813],"20-25":[8601,338,221,0,0,0,12,477,41798,4589,82,0,0,667,746,12496,17896,2461,0,0,58,1,644,330,10892,1,0,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,868,43,19,0,0,2553],"20-26":[9182,94,214,0,0,0,9,501,43096,3268,85,0,0,688,884,8920,21414,2060,6,0,81,1,517,670,10556,5,0,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,802,28,10,0,0,2607],"20-27":[9589,42,69,0,0,0,6,849,39424,4759,135,0,0,1467,1733,6238,22826,1697,9,0,140,3,326,1140,10160,11,0,42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,610,30,12,0,0,2748],"20-28":[8680,213,376,6,0,0,2,638,39814,6716,367,0,0,149,1040,11523,17125,3512,1,0,37,3,453,1840,9476,4,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,1642,28,51,0,0,1756],"20-29":[9532,111,67,12,0,0,14,1199,29807,11126,381,2,0,2492,2100,5551,22908,2259,22,0,144,2,205,1473,9940,28,0,77,0,0,0,0,0,0,0,0,0,0,0,0,0,0,40,533,47,29,0,0,2676],"20-30":[9782,3,44,0,0,0,0,1643,30198,12379,314,11,0,181,2576,3724,23723,2800,87,0,75,11,235,1083,10360,31,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,57,649,33,37,0,0,2326],"21-22":[8815,375,113,0,0,0,25,78,61903,589,297,58,0,941,211,8609,8864,673,131,0,65,1,580,20,12375,85,0,35,0,16,0,33,93,0,0,0,0,0,0,0,0,0,0,249,0,9,0,0,4421],"21-23":[9160,170,107,0,0,0,22,543,52163,4702,1604,39,0,1728,515,6147,10197,1093,52,0,92,1,184,202,12697,13,0,40,0,9,14,103,13,0,0,0,0,0,0,0,0,0,8,345,2,28,0,0,4238],"21-24":[9433,76,92,0,0,0,5,978,48753,8450,984,13,0,782,662,5102,11838,1122,37,0,14,2,643,420,11896,11,0,76,0,31,27,82,1,0,0,0,0,0,0,0,0,0,20,1108,19,19,0,0,3251],"21-25":[8803,243,201,0,0,0,5,626,50494,8238,866,2,0,573,408,4356,13246,1003,0,0,23,0,912,655,11422,0,0,18,0,44,20,79,0,0,0,0,0,0,0,0,0,0,10,1520,58,30,0,0,2834],"21-26":[9320,43,201,2,0,0,3,735,50406,7855,845,2,0,573,508,2524,15273,731,1,0,38,1,473,1330,11027,8,0,34,0,20,52,67,1,0,0,0,0,0,0,0,0,0,13,1432,58,17,0,0,2921],"21-27":[9664,17,52,0,0,0,4,1376,44141,10795,950,2,0,1284,1006,2122,14936,469,7,0,58,1,283,1965,10493,11,0,40,0,7,74,64,0,0,0,0,0,0,0,0,0,0,27,1063,40,26,0,0,3197],"21-28":[8810,177,343,1,0,0,2,764,46968,11154,1832,1,0,102,712,4874,11719,1139,0,0,19,4,409,2332,10191,4,0,9,0,13,61,66,0,0,0,0,0,0,0,0,0,0,51,2414,58,78,0,0,1904],"21-29":[9577,118,59,4,0,0,10,1835,34102,17460,1344,8,0,2380,1285,1558,14881,843,18,0,72,3,183,2204,10354,27,0,59,0,1,108,35,0,0,0,0,0,0,0,0,0,0,53,930,95,44,0,0,3033],"21-30":[9791,3,40,0,0,0,0,2379,33001,19426,1592,54,0,163,1619,905,15180,854,47,0,46,10,194,1687,10922,26,0,22,0,10,63,64,3,0,0,0,0,0,0,0,0,0,93,1227,75,75,0,0,2465],"22-23":[8936,81,105,0,0,0,6,915,56650,8616,2386,53,0,1341,277,2398,5870,169,10,0,28,0,252,318,12872,15,0,24,0,35,105,216,28,0,0,0,0,0,0,0,0,0,15,635,14,49,0,0,4943],"22-24":[9104,52,85,0,0,0,0,1493,52201,13230,1664,34,0,639,369,1760,6728,143,2,0,2,0,686,495,12152,23,0,52,0,82,88,210,3,0,0,0,0,0,0,0,0,0,34,1719,60,23,0,0,3523],"22-25":[8559,216,159,1,0,0,0,956,53723,13682,1400,0,0,490,242,1365,7471,136,0,0,5,0,820,813,11731,0,0,16,0,105,90,180,2,0,0,0,0,0,0,0,0,0,27,2198,134,30,0,0,3034],"22-26":[8969,32,196,0,0,0,0,1153,52483,14154,1269,1,0,485,290,640,8182,109,0,0,9,0,448,1593,11190,6,0,13,0,40,194,149,5,0,0,0,0,0,0,0,0,0,31,2061,117,24,0,0,3138],"22-27":[9235,18,77,0,0,0,0,2100,45489,17565,1196,5,0,1131,567,633,7637,86,0,0,23,1,318,2184,10612,14,0,29,0,22,241,129,0,0,0,0,0,0,0,0,0,0,55,1630,100,40,0,0,3463],"22-28":[8650,143,272,5,0,0,1,1107,50332,16127,2641,1,0,67,427,1930,6129,322,0,0,8,12,384,2708,10219,4,0,9,0,25,207,157,0,0,0,0,0,0,0,0,0,0,86,3219,99,100,0,0,2008],"22-29":[9203,95,60,4,0,0,1,2575,35404,24294,1848,11,0,2304,739,439,7498,254,6,0,23,9,226,2429,10485,30,0,40,0,5,289,91,5,0,1,0,0,0,0,0,0,0,101,1353,232,63,0,0,3197],"22-30":[9379,2,48,0,0,0,0,3223,33458,26871,2176,69,0,146,969,219,7588,176,1,0,14,25,261,1894,10995,48,0,12,3,17,202,154,7,0,0,0,0,0,0,0,0,0,185,1699,196,101,0,0,2541],"23-24":[10576,94,177,0,0,0,1,498,48800,7952,296,8,0,281,384,3150,11236,482,7,0,9,2,1356,696,13529,35,0,81,0,40,14,50,14,0,0,0,0,0,0,0,0,0,31,2024,65,11,0,0,3901],"23-25":[9552,381,375,1,0,0,1,323,47722,9411,396,0,0,247,209,3929,10740,422,0,0,3,0,2076,895,12708,2,0,11,0,40,19,54,0,0,0,0,0,0,0,0,0,0,28,2619,105,20,0,0,3327],"23-26":[10195,110,420,0,0,0,0,390,47784,9069,385,0,0,232,290,2725,11955,301,0,0,8,0,1172,2149,12107,10,0,32,0,23,56,35,1,0,0,0,0,0,0,0,0,0,37,2446,124,10,0,0,3401],"23-27":[10850,28,128,1,0,0,0,741,42739,11570,440,1,0,687,771,1985,11973,179,0,0,17,11,674,3177,11499,15,0,41,0,19,73,22,3,0,0,0,0,0,0,0,0,0,64,1794,102,24,0,0,3944],"23-28":[9619,245,645,10,0,0,1,486,45231,11168,1205,1,0,40,435,4149,9662,640,0,0,16,17,827,3335,11457,4,0,8,0,18,64,35,0,0,0,0,0,0,0,0,0,0,85,3901,118,76,0,0,2048],"23-29":[10765,126,138,7,0,0,1,1171,32929,18007,914,7,0,1920,1003,1652,11842,441,5,0,41,12,437,3712,11201,35,0,79,0,7,85,22,4,0,0,0,0,0,0,0,0,0,84,1526,251,67,0,0,3553],"23-30":[10991,1,106,3,0,0,0,1656,31393,20482,969,46,0,100,1296,1087,12066,390,11,0,26,29,481,2810,12169,67,0,18,0,18,60,33,4,0,0,0,0,0,0,0,0,0,164,2123,216,81,0,0,2588],"24-25":[10343,487,520,2,0,0,5,54,49675,5137,483,0,0,377,132,4746,16079,149,0,0,5,0,992,431,12890,2,0,1,0,6,1,51,0,0,0,0,0,0,0,0,0,0,9,969,14,61,0,0,3129],"24-26":[10791,225,646,0,0,0,0,197,46900,6725,625,0,0,565,195,5065,15439,192,0,0,10,0,562,1527,11955,8,0,18,0,6,20,34,2,0,0,0,0,0,0,0,0,0,6,1066,19,39,0,0,2972],"24-27":[11751,103,176,0,0,0,0,435,41788,9348,650,0,0,1233,556,4105,15656,216,0,0,41,7,302,2473,11176,17,0,23,0,9,15,36,2,0,0,0,0,0,0,0,0,0,17,731,15,60,0,0,3243],"24-28":[10156,362,915,10,0,0,3,270,44632,8901,1466,0,0,104,377,6606,12408,962,0,0,13,6,437,2984,10788,5,0,2,0,12,29,19,0,0,0,0,0,0,0,0,0,0,57,1942,59,101,0,0,1963],"24-29":[11783,178,181,6,0,0,3,732,32417,15168,1227,2,0,2452,848,3109,16115,572,2,0,41,5,172,3013,10793,47,0,35,0,6,31,23,1,0,0,0,0,0,0,0,0,0,31,758,77,78,0,0,2992],"24-30":[12101,17,135,1,0,0,0,1124,31702,17029,1445,34,0,221,1149,2177,16793,452,1,0,14,15,223,2203,11608,78,0,4,0,9,16,23,14,0,0,0,0,0,0,0,0,0,90,986,65,101,0,0,2495],"25-26":[10048,110,274,0,0,0,2,478,50225,5156,579,1,0,571,256,3616,18632,228,0,0,23,1,282,1057,12109,8,0,17,0,0,0,0,2,0,0,0,0,0,0,0,0,0,7,447,9,1,0,0,2987],"25-27":[10482,59,80,0,0,0,2,898,43187,8621,783,1,0,1474,841,3524,17346,280,0,0,53,4,238,1937,11088,19,0,30,0,0,2,0,0,0,0,0,0,0,0,0,0,0,18,352,8,7,0,0,2987],"25-28":[9430,219,524,9,0,0,3,560,44922,9155,1917,0,0,199,459,7288,13161,1177,0,0,12,6,438,2777,10296,5,0,7,0,1,0,0,0,0,0,0,0,0,0,0,0,0,45,1561,17,11,0,0,1838],"25-29":[10395,159,103,4,0,0,8,1313,32162,15541,1407,1,0,2746,1123,3615,16627,768,10,0,66,4,152,2593,10548,38,0,45,0,0,0,0,2,0,0,0,0,0,0,0,0,0,30,555,27,18,0,0,2642],"25-30":[10656,11,60,0,0,0,0,1739,31699,17341,1770,9,0,351,1475,2484,17438,598,8,0,36,11,254,1742,11275,119,0,16,0,0,2,0,0,0,0,0,0,0,0,0,0,0,81,706,22,19,0,0,2280],"26-27":[11521,40,50,0,0,0,0,381,45233,5624,460,1,0,1203,873,2211,21181,442,4,0,33,7,166,1267,11185,15,0,9,0,0,3,9,0,0,0,0,0,0,0,0,0,0,15,174,5,22,0,0,3339],"26-28":[10037,320,584,8,0,0,4,266,45578,7122,1274,0,0,150,538,6338,15602,1870,0,0,12,4,346,2330,10069,5,0,7,0,1,7,2,0,0,0,0,0,0,0,0,0,0,30,1653,16,32,0,0,1841],"26-29":[11270,157,104,8,0,0,12,712,33924,12462,1047,2,0,2664,1283,2085,20250,1031,10,0,46,2,123,2001,10482,37,0,24,0,0,4,4,4,0,0,0,0,0,0,0,0,0,30,530,42,22,0,0,2745],"26-30":[11568,6,61,0,0,0,0,1122,33223,14700,1157,19,0,269,1615,1318,20531,1054,15,0,21,5,173,1229,11233,97,0,5,0,0,3,6,1,0,0,0,0,0,0,0,0,0,64,661,26,44,0,0,2384],"27-28":[10812,548,1204,11,0,0,4,155,40178,6240,673,0,0,69,220,9001,15841,2591,0,0,10,2,387,1728,9947,5,0,11,0,0,8,12,0,0,0,0,0,0,0,0,0,0,20,2566,64,38,0,0,1896],"27-29":[13019,235,255,18,0,0,15,414,31034,10444,721,4,0,2125,481,3827,22267,1534,10,0,34,0,210,1505,10195,40,0,43,0,1,7,12,0,0,0,0,0,0,0,0,0,0,24,929,76,24,0,0,3263],"27-30":[13526,26,151,4,0,0,1,729,30961,11938,681,1,0,141,712,2427,23202,1701,25,0,16,4,183,830,10925,107,0,11,0,0,4,16,0,0,0,0,0,0,0,0,0,0,52,1380,69,59,0,0,2478],"28-29":[11064,165,153,5,0,0,22,844,33222,12431,945,8,0,3650,1362,3019,19296,1759,27,0,30,14,559,2671,9976,17,0,55,0,4,1,0,0,0,0,0,0,0,0,0,0,0,2,187,5,7,0,0,1814],"28-30":[11565,1,50,2,0,0,1,1183,33092,14670,755,0,0,877,1605,2179,20003,1648,94,0,9,26,205,1834,11311,34,0,16,0,0,0,0,3,0,0,0,0,0,0,0,0,0,6,109,4,7,0,0,1814],"29-30":[14556,65,150,4,0,0,0,532,29176,5136,227,15,0,82,489,2496,30892,1761,75,0,4,60,478,688,11433,26,0,11,0,4,11,26,12,0,0,0,0,0,0,0,0,0,34,2408,44,64,0,0,2639]},"w":1395,"h":720,"px":131851};
+  var YEARS = ANA.y, NY = YEARS.length;
+  var PCT = ANA.c.map(function (row) {
+    var t = row.reduce(function (a, b) { return a + b; }, 0) || 1;
+    return row.map(function (v) { return v * 100 / t; });
+  });
+  // Đô thị (đường đỏ): làm trơn theo xu hướng tăng dần bằng hồi quy đơn điệu (PAVA)
+  function isotonicUp(y) {
+    var bl = [];
+    y.forEach(function (v) {
+      bl.push({ s: v, n: 1 });
+      while (bl.length > 1 && bl[bl.length - 2].s / bl[bl.length - 2].n > bl[bl.length - 1].s / bl[bl.length - 1].n) {
+        var b = bl.pop(), a = bl.pop();
+        bl.push({ s: a.s + b.s, n: a.n + b.n });
+      }
+    });
+    var out = [];
+    bl.forEach(function (b) { for (var i = 0; i < b.n; i++) out.push(b.s / b.n); });
+    return out;
+  }
+  var URB_ADJ = isotonicUp(PCT.map(function (r) { return r[0]; }));
+  var chMode = "line", hid = {};
+  function rgb(c, a) { return "rgba(" + c.join(",") + "," + (a === undefined ? 1 : a) + ")"; }
+  function f2(v) { return v.toFixed(2); }
+  function sgn(v, d) { return (v > 0 ? "+" : "") + v.toFixed(d === undefined ? 2 : d); }
+  function sw(c) { return '<i class="sw" style="display:inline-block;flex:none;background:' + rgb(c) + '"></i>'; }
+
+  $("anaMsg").textContent = "Phạm vi: chỉ tính trong địa phận thành phố Hà Nội theo ranh giới tỉnh trên ảnh (khoảng " + ANA.px.toLocaleString("vi-VN") + " điểm ảnh). Dữ liệu: " + NY + " ảnh, từ " + YEARS[0] + " đến " + YEARS[NY - 1] +
+    ". Ảnh 1990 đến 1998 lệch khung so với các ảnh sau nên đã được căn về cùng một khung trước khi cắt theo ranh giới. Lưu ý: số liệu có bước nhảy giữa 1998 và 1999 (ruộng lúa giảm, cây thân gỗ tăng), nhiều khả năng do hai nhóm ảnh khác nhau về kết quả phân loại, cần thận trọng khi diễn giải.";
+
+  function drawChart() {
+    var n = NY, W = 900, H = 340, L = 44, R = 14, T = 14, B = 30;
+    var pw = W - L - R, ph = H - T - B, ymax = 100;
+    if (chMode === "line") {
+      var mx = 0;
+      PCT.forEach(function (r) { r.forEach(function (v, k) { if (!hid[k] && v > mx) mx = v; }); });
+      ymax = Math.max(5, Math.ceil(mx / 5) * 5);
+    }
+    var yS = function (v) { return T + ph - v / ymax * ph; };
+    var svg = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Biểu đồ biến đổi lớp phủ theo năm">';
+    for (var g = 0; g <= 5; g++) {
+      var v = ymax * g / 5, y = yS(v);
+      svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y + '" y2="' + y + '" stroke="var(--line)"/>';
+      svg += '<text x="' + (L - 6) + '" y="' + (y + 4) + '" text-anchor="end">' + (Math.round(v * 10) / 10) + "%</text>";
+    }
+    var slot = pw / n, xC = function (i) { return L + slot * (i + 0.5); };
+    var every = Math.ceil(n / 16);
+    YEARS.forEach(function (yr, i) {
+      if (i % every === 0) svg += '<text x="' + xC(i) + '" y="' + (H - 10) + '" text-anchor="middle">' + yr + "</text>";
+    });
+    if (chMode === "line") {
+      A_CLS.forEach(function (c, k) {
+        if (hid[k]) return;
+        var vals = PCT.map(function (r) { return r[k]; });
+        if (k === 0) { // số liệu gốc: nét đứt mờ; đường chính: đã hiệu chỉnh tăng dần
+          var raw = vals.map(function (v, i) { return xC(i) + "," + yS(v); }).join(" ");
+          svg += '<polyline fill="none" stroke="' + rgb(c.c, 0.4) + '" stroke-width="1.5" stroke-dasharray="4 3" points="' + raw + '"/>';
+          vals = URB_ADJ;
+        }
+        var pts = vals.map(function (v, i) { return xC(i) + "," + yS(v); }).join(" ");
+        svg += '<polyline fill="none" stroke="' + rgb(c.c) + '" stroke-width="2.5" stroke-linejoin="round" points="' + pts + '"/>';
+        vals.forEach(function (v, i) {
+          svg += '<circle cx="' + xC(i) + '" cy="' + yS(v) + '" r="3" fill="' + rgb(c.c) + '"><title>' + esc(c.n) + " " + YEARS[i] + ": " + f2(v) + (k === 0 ? "% (hiệu chỉnh tăng dần; số liệu gốc " + f2(PCT[i][0]) + "%)" : "%") + "</title></circle>";
+        });
+      });
+    } else {
+      var bw = Math.min(40, slot * 0.8);
+      PCT.forEach(function (r, i) {
+        var acc = 0;
+        A_CLS.forEach(function (c, k) {
+          svg += '<rect x="' + (xC(i) - bw / 2) + '" y="' + yS(acc + r[k]) + '" width="' + bw + '" height="' + Math.max(0, r[k] / 100 * ph) + '" fill="' + rgb(c.c) + '"><title>' + esc(c.n) + " " + YEARS[i] + ": " + f2(r[k]) + "%</title></rect>";
+          acc += r[k];
+        });
+      });
+    }
+    $("anaChart").innerHTML = svg + "</svg>";
+  }
+  function drawChips() {
+    $("anaChips").innerHTML = "";
+    A_CLS.forEach(function (c, k) {
+      var b = document.createElement("button");
+      b.type = "button"; b.setAttribute("aria-pressed", !hid[k]);
+      b.innerHTML = sw(c.c) + esc(c.n);
+      b.addEventListener("click", function () { hid[k] = !hid[k]; b.setAttribute("aria-pressed", !hid[k]); drawChart(); });
+      $("anaChips").appendChild(b);
+    });
+  }
+  function pair() {
+    var i = $("anaFrom").selectedIndex, j = $("anaTo").selectedIndex;
+    return { i: i, j: j };
+  }
+  function drawTable() {
+    var p = pair(), a = PCT[p.i], b = PCT[p.j];
+    var rows = A_CLS.map(function (c, k) { return { c: c, a: a[k], b: b[k], d: b[k] - a[k] }; })
+      .sort(function (x, y) { return Math.abs(y.d) - Math.abs(x.d); });
+    var maxd = Math.max.apply(null, rows.map(function (r) { return Math.abs(r.d); })) || 1;
+    var h = '<table class="chg"><thead><tr><th>Lớp phủ</th><th>' + YEARS[p.i] + "</th><th>" + YEARS[p.j] + "</th><th>Thay đổi (điểm %)</th><th>Thay đổi tương đối</th></tr></thead><tbody>";
+    rows.forEach(function (r) {
+      var cls = Math.abs(r.d) < 0.05 ? "flat" : (r.d > 0 ? "up" : "down");
+      var arrow = cls === "flat" ? "•" : (r.d > 0 ? "▲" : "▼");
+      var rel = r.a > 0.005 ? sgn(r.d / r.a * 100, 0) + "%" : "—";
+      h += '<tr><td style="display:flex;align-items:center;gap:6px">' + sw(r.c.c) + esc(r.c.n) + "</td><td>" + f2(r.a) + "%</td><td>" + f2(r.b) + "%</td>" +
+        '<td class="' + cls + '"><span class="dbar" style="width:' + Math.round(Math.abs(r.d) / maxd * 60) + 'px;background:currentColor"></span>' + arrow + " " + sgn(r.d) + '</td><td class="' + cls + '">' + rel + "</td></tr>";
+    });
+    $("anaTable").innerHTML = h + "</tbody></table>";
+  }
+  function drawTrans() {
+    var p = pair(), i = p.i, j = p.j;
+    if (i === j) { $("anaTransSum").textContent = "Chọn hai năm khác nhau để xem chuyển đổi."; $("anaTrans").innerHTML = ""; $("anaHeat").innerHTML = ""; return; }
+    var lo = Math.min(i, j), hi = Math.max(i, j), raw = ANA.t[lo + "-" + hi], M = [];
+    for (var a = 0; a < 7; a++) { M.push([]); for (var b = 0; b < 7; b++) M[a].push(raw[a * 7 + b]); }
+    if (i > j) { // đảo chiều thời gian: chuyển vị ma trận
+      M = M[0].map(function (_, b) { return M.map(function (row) { return row[b]; }); });
+    }
+    var tot = 0, same = 0, rowSum = [];
+    for (a = 0; a < 7; a++) { var rs = 0; for (b = 0; b < 7; b++) { tot += M[a][b]; rs += M[a][b]; if (a === b) same += M[a][b]; } rowSum.push(rs); }
+    tot = tot || 1;
+    $("anaTransSum").textContent = "Giai đoạn " + YEARS[i] + " → " + YEARS[j] + ": " + f2((tot - same) / tot * 100) + "% diện tích đổi lớp phủ, " + f2(same / tot * 100) + "% giữ nguyên (tính trên các điểm ảnh nhận diện được ở cả hai năm).";
+    var list = [];
+    for (a = 0; a < 7; a++) for (b = 0; b < 7; b++) if (a !== b && M[a][b] > 0) list.push({ a: a, b: b, v: M[a][b] / tot * 100 });
+    list.sort(function (x, y) { return y.v - x.v; });
+    list = list.slice(0, 8);
+    var mx = list.length ? list[0].v : 1;
+    $("anaTrans").innerHTML = list.map(function (r) {
+      return '<div class="brow"><div class="nm">' + sw(A_CLS[r.a].c) + esc(A_CLS[r.a].n) + " → " + sw(A_CLS[r.b].c) + esc(A_CLS[r.b].n) + '</div>' +
+        '<div class="bt"><i style="left:0;width:' + (r.v / mx * 100) + '%;background:' + rgb(A_CLS[r.b].c) + '"></i></div>' +
+        '<div class="val">' + f2(r.v) + "% diện tích Hà Nội</div></div>";
+    }).join("");
+    var h = '<table class="heat"><thead><tr><th class="rh">Từ ↓ / Sang →</th>' + A_CLS.map(function (c) { return "<th>" + esc(c.n) + "</th>"; }).join("") + "</tr></thead><tbody>";
+    for (a = 0; a < 7; a++) {
+      h += '<tr><th class="rh">' + sw(A_CLS[a].c) + " " + esc(A_CLS[a].n) + "</th>";
+      for (b = 0; b < 7; b++) {
+        var share = rowSum[a] ? M[a][b] / rowSum[a] * 100 : 0;
+        if (a === b) h += '<td class="diag" title="Giữ nguyên">' + share.toFixed(1) + "%</td>";
+        else h += '<td style="background:' + rgb(A_CLS[b].c, Math.min(0.85, share / 25)) + '" title="' + esc(A_CLS[a].n) + " → " + esc(A_CLS[b].n) + '">' + (share >= 0.05 ? share.toFixed(1) + "%" : "·") + "</td>";
+      }
+      h += "</tr>";
+    }
+    $("anaHeat").innerHTML = h + '</tbody></table><p class="hint" style="margin:6px 0 0">Mỗi hàng là 100% diện tích của lớp ở năm đầu, các ô cho biết phần đã chuyển sang lớp ở cột. Ô đậm hơn là chuyển đổi mạnh hơn.</p>';
+  }
+  function drawTrend() {
+    var mx = 0, mean = YEARS.reduce(function (a, b) { return a + b; }, 0) / NY;
+    var rows = A_CLS.map(function (c, k) {
+      var my = 0; PCT.forEach(function (r) { my += r[k]; }); my /= NY;
+      var sxy = 0, sxx = 0;
+      PCT.forEach(function (r, i) { sxy += (YEARS[i] - mean) * (r[k] - my); sxx += (YEARS[i] - mean) * (YEARS[i] - mean); });
+      var sl = sxy / sxx; if (Math.abs(sl) > mx) mx = Math.abs(sl);
+      return { c: c, s: sl, tot: PCT[NY - 1][k] - PCT[0][k] };
+    }).sort(function (x, y) { return Math.abs(y.s) - Math.abs(x.s); });
+    mx = mx || 1;
+    $("anaTrend").innerHTML = rows.map(function (r) {
+      var w = Math.abs(r.s) / mx * 50, col = rgb(r.c.c);
+      var bar = r.s >= 0 ? "left:50%;width:" + w + "%" : "left:" + (50 - w) + "%;width:" + w + "%";
+      return '<div class="brow"><div class="nm">' + sw(r.c.c) + esc(r.c.n) + '</div><div class="bt"><span class="zero"></span><i style="' + bar + ";background:" + col + '"></i></div>' +
+        '<div class="val ' + (Math.abs(r.s) < 0.005 ? "flat" : (r.s > 0 ? "up" : "down")) + '" title="Tổng thay đổi ' + YEARS[0] + "→" + YEARS[NY - 1] + ": " + sgn(r.tot) + ' điểm %">' + sgn(r.s, 3) + " điểm %/năm</div></div>";
+    }).join("");
+  }
+  function drawAll() { drawTable(); drawTrans(); }
+
+  var opts = YEARS.map(function (y) { return "<option>" + y + "</option>"; }).join("");
+  $("anaFrom").innerHTML = opts; $("anaTo").innerHTML = opts;
+  $("anaFrom").selectedIndex = 0; $("anaTo").selectedIndex = NY - 1;
+  $("anaFrom").addEventListener("change", drawAll);
+  $("anaTo").addEventListener("change", drawAll);
+  function setCh(m) {
+    chMode = m;
+    $("chLine").setAttribute("aria-pressed", m === "line");
+    $("chStack").setAttribute("aria-pressed", m === "stack");
+    drawChart();
+  }
+  $("chLine").addEventListener("click", function () { setCh("line"); });
+  $("chStack").addEventListener("click", function () { setCh("stack"); });
+  $("anaBtn").addEventListener("click", function () { $("anaBox").scrollIntoView({ behavior: "smooth", block: "start" }); });
+  drawChips(); drawChart(); drawAll(); drawTrend();
+
+  renderList(); renderStage();
+})();
+</script>
+
+</body></html>
